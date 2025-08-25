@@ -1,106 +1,190 @@
-# Laravel Shadcn Admin Dashboard
+# AskMe - AI-Powered Price Comparison Platform
 
-A modern, responsive, and accessible admin dashboard built with Shadcn UI, Laravel, and Vite. This project combines the elegance of Shadcn's UI components with the robustness of Laravel's backend framework, providing a seamless development experience.
+A conversational AI platform that helps customers find and compare product prices based on their location. Built with Laravel 12 and React 18, AskMe provides ChatGPT-style price inquiry through intelligent location-based comparisons.
 
-![alt text](public/images/shadcn-admin.png)
+![AskMe Platform](public/images/askme-platform.png)
 
-This project is inspired by [Shadcn-admin](https://github.com/satnaing/shadcn-admin) and adapted to work seamlessly with Laravel and Inertia.js.
+## Key Features
 
-## Features
+### 🤖 Conversational AI Interface
+- ChatGPT-style chat experience for natural price inquiries
+- Multi-session chat management for organized conversations
+- Streaming responses for real-time interaction
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global Search Command
-- 10+ pages
-- Extra custom components
+### 📍 Location-Based Intelligence
+- Automatic location detection and filtering
+- Geographic price comparisons from nearby retailers
+- Privacy-conscious location handling
 
-## Tech Stack
+### 💰 Intelligent Price Analysis
+- LLM-powered product price research
+- Comparative analysis across multiple sources
+- Real-time pricing data integration
 
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
+### 🎨 Modern User Experience
+- Light/dark mode support with smooth transitions
+- Fully responsive design for all devices
+- Accessible interface following WCAG guidelines
+- Built with Shadcn/ui design system
 
-**Backend:** [Laravel](https://laravel.com/) 12.x
+## Technology Stack
 
-**Frontend Integration:** [InertiaJs](https://inertiajs.com/)
+### Core Architecture
+- **Backend**: [Laravel](https://laravel.com/) 12.x with PHP 8.3+
+- **Frontend**: [React](https://react.dev/) 18 with [TypeScript](https://www.typescriptlang.org/) (strict mode)
+- **SPA Integration**: [Inertia.js](https://inertiajs.com/) v2 for seamless Laravel-React communication
+- **Database**: MySQL with optimized indexing for location-based queries
 
-**Build Tool:** [Vite](https://vitejs.dev/)
+### Key Dependencies
+- **UI Framework**: [Shadcn/ui](https://ui.shadcn.com) (Radix UI + Tailwind CSS v3.4)
+- **State Management**: [React Query v5.63](https://tanstack.com/query) for server state
+- **Form Handling**: [React Hook Form v7.54](https://react-hook-form.com) + [Zod v3.24](https://zod.dev)
+- **Development Tools**: [Vite](https://vitejs.dev), [Laravel Boost](https://laravel-boost.dev)
+- **Code Quality**: [ESLint](https://eslint.org), [Prettier](https://prettier.io), [Laravel Pint](https://laravel.com/docs/pint)
 
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
+### AI & Integration (Planned)
+- LLM API integration for conversational price queries
+- Geolocation services for location-based filtering
+- Real-time price data synchronization
 
-**Linting/Formatting:** [Eslint](https://eslint.org/) & [Prettier](https://prettier.io/)
+## Installation & Setup
 
-**Icons:** [Tabler Icons](https://tabler.io/icons)
+### Prerequisites
+- PHP 8.3 or higher
+- Node.js 18+ and npm/bun
+- MySQL database
+- Composer
 
-## Run Locally
+### Installation Steps
 
-1. Clone the project
-
+1. **Clone the repository**
 ```bash
-  git clone git@github.com:binjuhor/shadcn-lar.git
+git clone [repository-url]
+cd askme
 ```
 
-2. Go to the project directory
-
+2. **Install dependencies**
 ```bash
-  cd shadcn-lar
+# PHP dependencies
+composer install
+
+# JavaScript dependencies
+npm install
 ```
 
-3. Install dependencies
-
-- Install JavaScript dependencies:
-
+3. **Environment configuration**
 ```bash
-  pnpm install
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+
+# Configure database connection in .env
+# Set up any required API keys
 ```
 
-- Install PHP dependencies:
-
+4. **Database setup**
 ```bash
-  composer install
+# Run migrations
+php artisan migrate
+
+# (Optional) Seed with sample data
+php artisan db:seed
 ```
 
-- Data migration
-
+5. **Start development servers**
 ```bash
-  php artisan migrate
+# Start both frontend and backend servers
+composer run dev
+
+# Alternative: Start servers separately
+# npm run dev (frontend)
+# php artisan serve (backend)
 ```
 
-4. Start the dev
-Frotnedend and Backend server
-- Start the Vite development server:
+6. **Access the application**
+Open your browser and visit `http://localhost:8000`
 
-```bash
-  pnpm run dev
+## Development Workflow
+
+### Development Guidelines
+This project follows comprehensive development standards documented in `CLAUDE.md`. Key practices include:
+
+- **Laravel Boost Integration**: All development tasks must use Laravel Boost tools for debugging and enhancement
+- **Spec-Driven Development**: New features follow the specification workflow in `.claude/specs/`
+- **Code Quality Standards**: Laravel Pint (PHP), ESLint & Prettier (TypeScript/React)
+- **Testing Approach**: PHPUnit for backend, feature tests preferred over unit tests
+
+### Project Structure
+The codebase follows Laravel 12's streamlined structure with React/TypeScript frontend:
+
 ```
-- Start the Laravel development server:
-
-```bash
-  php artisan serve
+app/Http/Controllers/     # Feature controllers
+app/Models/              # Eloquent models  
+resources/js/pages/      # Inertia page components
+resources/js/components/ # Reusable React components
+routes/                  # Laravel route definitions
 ```
 
-5. Open your browser and visit http://localhost:8000 to view the dashboard.
+See `.claude/steering/structure.md` for complete organization guidelines.
 
-## Roadmap
+### Development Commands
+```bash
+# Code formatting
+vendor/bin/pint           # Format PHP code
+npm run lint             # Lint TypeScript/React
+npm run format           # Format with Prettier
 
-Here are some of the planned features for future updates:
+# Testing
+php artisan test         # Run PHP tests
+npm run test            # Run JavaScript tests (if configured)
 
-- **User Permissions & Roles:** Manage user roles and permissions with a flexible and intuitive system.
+# Development server
+composer run dev        # Full-stack development server
+```
 
-- **Profile Manager:** Allow users to update their profiles, including personal information and security settings.
+## Project Roadmap
 
-- **Post & Page Manager:** Create and manage dynamic posts and pages with a rich text editor.
+### Phase 1: Core Platform ✅ *In Progress*
+- [x] Authentication and user management system
+- [x] Theme-aware responsive UI foundation
+- [ ] Multi-session chat interface
+- [ ] Basic LLM integration for price queries
+- [ ] Location-based price filtering
 
-- **Theme & Plugin Manager:** Easily install and manage themes and plugins to extend functionality.
+### Phase 2: Advanced Features *Planned*
+- Enhanced price comparison algorithms
+- Real-time pricing updates
+- Mobile optimization
+- Advanced analytics dashboard
+- Chat conversation persistence
 
-- **File & Media Manager:** A powerful file and media manager for handling uploads and organizing assets.
+### Phase 3: Expansion *Future*
+- API for third-party integrations
+- Premium features for power users
+- Merchant partnerships
+- Advanced recommendation engine
+- Multi-language support
+
+### Contributing
+This project uses a spec-driven development workflow. To contribute:
+
+1. Check existing specifications in `.claude/specs/`
+2. Follow development guidelines in `CLAUDE.md`
+3. Use Laravel Boost for all development and debugging tasks
+4. Ensure all code follows the established conventions in `.claude/steering/`
+
+For detailed contribution guidelines, see the project's steering documents.
 
 
-
-## Author
-
-This project was crafted with 🤍 by [@binjuhor](https://github.com/binjuhor)
 
 ## License
 
-This project is open-source and licensed under the [MIT License](https://choosealicense.com/licenses/mit/). Feel free to use, modify, and distribute it as needed.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+*For detailed development guidelines, see [CLAUDE.md](CLAUDE.md)*  
+*For project specifications, see [.claude/specs/](.claude/specs/)*  
+*For architectural decisions, see [.claude/steering/](.claude/steering/)*
