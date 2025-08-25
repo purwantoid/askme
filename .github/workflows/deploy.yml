@@ -1,0 +1,69 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key and known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Build frontend assets
+        run: |
+          echo "Building frontend assets..."
+          yarn install
+          yarn build
+          echo "Frontend assets built."
+
+      - name: Deploy code using rsync
+        run: |
+          echo "Starting rsync deployment..."
+          rsync -rlptDzv --no-owner --no-group -e "ssh -o StrictHostKeyChecking=no" \
+          --exclude .env --exclude .env.example --exclude .git --exclude .github --exclude .editorconfig \
+          --exclude node_modules --exclude tests --exclude storage --exclude .gitattributes --exclude .gitignore \
+          --exclude README.md --exclude .env.testing --exclude .prettierrc --exclude components.json \
+          --exclude package.json --exclude yarn.lock --exclude package-lock.json --exclude tsconfig.json \
+          --exclude phpunit.xml --exclude *.js --exclude tailwind.config.js --exclude vite.config.js \
+          --exclude resources/js --exclude resources/css \
+          $GITHUB_WORKSPACE/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}/
+          echo "Code deployment completed."
+      - name: Restart Docker containers
+        run: |
+          echo "Restarting Docker containers..."
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DOCKER_DIR }} && docker compose restart"
+          echo "Docker containers restarted."
+
+      - name: Install Composer dependencies
+        run: |
+          echo "Installing Composer dependencies..."
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker exec -i laravel composer install --no-interaction --prefer-dist --optimize-autoloader"
+          echo "Composer dependencies installed."
+
+      - name: Run database migrations
+        run: |
+          echo "Running database migrations..."
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker exec -i laravel php artisan migrate --force"
+          echo "Database migrations completed."
+
+      - name: Clear application cache
+        run: |
+          echo "Clearing application cache..."
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker exec -i laravel php artisan cache:clear"
+          echo "Application cache cleared."
+
+      - name: Optimize Laravel application
+        run: |
+          echo "Clearing and optimizing application cache..."
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker exec -i laravel php artisan optimize:clear"
+          echo "Application optimized."
