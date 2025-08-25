@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('auth/sign-in/sign-in-2'));
+Route::get('/', fn () => Inertia::render('welcome'));
 Route::get('/sign-in', fn () => Inertia::render('auth/sign-in/index'));
 Route::get('/sign-in-2', fn () => Inertia::render('auth/sign-in/sign-in-2'));
 Route::get('/sign-up', fn () => Inertia::render('auth/sign-up/index'));
