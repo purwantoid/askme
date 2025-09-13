@@ -1,0 +1,150 @@
+services:
+  app:
+    image: purwantogz/php:8.3.1-phpunit
+    platform: linux/amd64
+    depends_on:
+      - mysql
+      - mailpit
+      - meilisearch
+      - redis
+    environment:
+      TZ: "Asia/Jakarta"
+      ENV_TYPE: "developer"
+      OPCACHE_ENABLE: "FALSE"
+      XDEBUG_SESSION: "smallerid-xdebug-session"
+      XDEBUG_ENABLE: "true"
+      XDEBUG_CLIENT_HOST: "host.docker.internal"
+      XDEBUG_CLIENT_PORT: "9001"
+      XDEBUG_START_REQUEST: "yes"
+    volumes:
+      - .:/var/www:delegated
+      - /var/www/.git
+      - ./storage/logs:/var/log/:delegated
+      - ~/.composer/cache:/root/.composer/cache:delegated
+      - ./infrastructure/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf:delegated
+      - ./conf_environment_docker.php:/usr/local/lib/php/conf_environment_docker.php
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+    networks:
+      - askme_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  worker:
+    image: purwantogz/php:8.3.1-phpunit
+    platform: linux/amd64
+    depends_on:
+      - mysql
+      - mailpit
+      - meilisearch
+      - redis
+    environment:
+      TZ: "Asia/Jakarta"
+      ENV_TYPE: "developer"
+      OPCACHE_ENABLE: "FALSE"
+      XDEBUG_SESSION: "smallerid-xdebug-session"
+    volumes:
+      - .:/var/www:delegated
+      - /var/www/.git
+      - ./storage/logs:/var/log/:delegated
+      - ~/.composer/cache:/root/.composer/cache:delegated
+      - ./infrastructure/supervisord-worker.conf:/etc/supervisor/conf.d/supervisord.conf:delegated
+      - ./conf_environment_docker.php:/usr/local/lib/php/conf_environment_docker.php
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+    networks:
+      - askme_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mysql:
+    image: 'mysql/mysql-server:8.0'
+    platform: linux/amd64
+    ports:
+      - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - './infrastructure/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+    networks:
+      - askme_network
+
+  meilisearch:
+    image: 'getmeili/meilisearch:latest'
+    platform: linux/amd64
+    ports:
+      - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
+    environment:
+      MEILI_NO_ANALYTICS: '${MEILISEARCH_NO_ANALYTICS:-false}'
+    networks:
+      - askme_network
+
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    platform: linux/amd64
+    ports:
+      - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+      - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    networks:
+      - askme_network
+
+  web:
+    build: infrastructure/nginx/
+    platform: linux/amd64
+    depends_on:
+      - app
+    ports:
+      - "${FORWARD_WEB_PORT:-81}:80"
+    volumes:
+      - .:/var/www:delegated
+      - /var/www/.git
+      - ./infrastructure/nginx:/etc/nginx/conf.d:delegated
+      - ./storage/logs:/var/log/:delegated
+    links:
+      - app
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+    networks:
+      - askme_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  react:
+    image: oven/bun:latest
+    platform: linux/amd64
+    working_dir: /var/www
+    volumes:
+      - .:/var/www:delegated
+    ports:
+      - "5173:5173"
+    command: sh -c "bun install && bun run dev --host 0.0.0.0"
+    stdin_open: true
+    tty: true
+    dns:
+      - 8.8.8.8
+      - 9.9.9.9
+    networks:
+      - askme_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '${FORWARD_REDIS_PORT:-6379}:6379'
+    networks:
+      - askme_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  askme_network:
+    driver: bridge
