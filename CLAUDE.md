@@ -1,3 +1,244 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+AskMe is an AI-powered price comparison platform built with Laravel 12 and React 18. It provides a ChatGPT-style conversational interface for users to inquire about product prices based on their location.
+
+### Technology Stack
+
+- **Backend**: Laravel 12 (PHP 8.3+)
+- **Frontend**: React 18 with TypeScript (strict mode)
+- **SPA Integration**: Inertia.js v2
+- **Database**: SQLite (default), MySQL supported
+- **UI Framework**: Shadcn/ui (Radix UI + Tailwind CSS v3)
+- **State Management**: React Query v5.63 + Jotai for client state
+- **Form Handling**: React Hook Form v7.54 + Zod v3.24
+- **Build Tool**: Vite 6.2
+- **Package Manager**: npm (Node.js 18+)
+
+## Development Commands
+
+### Installation & Setup
+```bash
+# Clone and install dependencies
+composer install
+npm install
+
+# Environment setup
+cp .env.example .env
+php artisan key:generate
+
+# Database setup
+php artisan migrate
+php artisan db:seed  # Optional sample data
+```
+
+### Development Servers
+```bash
+# Start all development servers (recommended)
+composer run dev
+# This runs: server, queue, logs, and vite concurrently
+
+# Alternative: Start servers individually
+php artisan serve       # Backend server (port 8000)
+npm run dev            # Frontend development server
+php artisan queue:listen --tries=1  # Queue worker
+php artisan pail --timeout=0        # Log viewer
+```
+
+### Code Quality & Testing
+```bash
+# PHP code formatting (MUST run before commits)
+vendor/bin/pint --dirty
+
+# Run tests
+php artisan test                    # All tests
+php artisan test --filter=SomeTest # Specific test
+php artisan test tests/Feature/     # Feature tests only
+php artisan test tests/Unit/        # Unit tests only
+
+# Frontend build
+npm run build  # Production build
+npm run dev    # Development build with watch
+```
+
+### Debugging & Development Tools
+```bash
+# Laravel Tinker for debugging
+php artisan tinker
+
+# Generate application key
+php artisan key:generate
+
+# Clear caches
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# Laravel Boost commands (use MCP tools when available)
+# - database-query tool for database queries
+# - tinker tool for PHP debugging
+# - search-docs tool for documentation
+```
+
+## Project Architecture
+
+### Laravel 12 Streamlined Structure
+This project uses Laravel 12's modern streamlined file structure:
+
+- **No `app/Http/Middleware/`** - Middleware registered in `bootstrap/app.php`
+- **No `app/Console/Kernel.php`** - Console configuration in `bootstrap/app.php` or `routes/console.php`
+- **Auto-registered commands** - Files in `app/Console/Commands/` are automatically available
+- **Simplified configuration** - Core config in `bootstrap/app.php` and `bootstrap/providers.php`
+
+### Frontend Architecture (React + Inertia)
+```
+resources/js/
+├── app.tsx              # Main application entry point
+├── bootstrap.ts         # Bootstrap configuration
+├── providers.tsx        # React providers setup
+├── components/          # Reusable React components (33+ components)
+├── pages/               # Inertia page components (21+ pages)
+├── layouts/             # Layout components
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions and configurations
+├── context/             # React context providers
+├── config/              # Frontend configuration
+└── types/               # TypeScript type definitions
+```
+
+### Backend Architecture (Laravel)
+```
+app/
+├── Http/
+│   ├── Controllers/     # Feature controllers
+│   └── Requests/        # Form request validation classes
+├── Models/              # Eloquent models
+└── Providers/           # Service providers
+
+routes/
+├── web.php              # Web routes
+├── auth.php             # Authentication routes  
+├── dashboard.php        # Dashboard routes
+└── console.php          # Console commands
+
+bootstrap/
+├── app.php              # Application configuration
+└── providers.php        # Service provider registration
+```
+
+### Key Architectural Patterns
+
+#### Authentication System
+- Laravel Sanctum for API authentication
+- Custom authentication routes in `routes/auth.php`
+- Inertia-based auth pages in `resources/js/pages/auth/`
+
+#### Form Handling Pattern
+- **Backend**: Form Request classes for validation (check existing requests for array vs string rules)
+- **Frontend**: React Hook Form + Zod for client-side validation
+- **Integration**: Inertia forms with error handling
+
+#### State Management Strategy
+- **Server State**: React Query v5.63 for API data, caching, and synchronization
+- **Client State**: Jotai for component state management
+- **Theme State**: next-themes for light/dark mode persistence
+
+#### Component Architecture
+- **Design System**: Shadcn/ui components with Radix UI primitives
+- **Styling**: Tailwind CSS v3 with CSS variables for theming
+- **Responsive**: Mobile-first approach with dark mode support
+- **Accessibility**: WCAG compliance through Radix UI
+
+#### Database Design
+- **Default**: SQLite for development (configured in `.env.example`)
+- **Production**: MySQL/PostgreSQL support
+- **Migrations**: Standard Laravel migrations in `database/migrations/`
+- **Relationships**: Eloquent relationships with return type hints
+
+## Development Conventions
+
+### PHP/Laravel Conventions
+- **Constructor Property Promotion**: Use PHP 8 syntax `public function __construct(public Service $service)`
+- **Type Declarations**: Always use explicit return types and parameter types
+- **Eloquent**: Prefer `Model::query()` over `DB::`, use eager loading to prevent N+1 queries
+- **Validation**: Form Request classes over inline validation
+- **Configuration**: Use `config()` helper, never `env()` outside config files
+- **Testing**: Feature tests preferred over unit tests, use model factories
+
+### Frontend/React Conventions
+- **TypeScript**: Strict mode enabled, explicit typing required
+- **Components**: Functional components with proper prop typing
+- **Hooks**: Custom hooks for reusable logic in `resources/js/hooks/`
+- **Styling**: Tailwind classes, use gap utilities over margins for spacing
+- **Forms**: React Hook Form + Zod validation schema
+- **State**: React Query for server state, Jotai for client state
+
+### Code Style Enforcement
+- **PHP**: Laravel Pint (must run `vendor/bin/pint --dirty` before commits)
+- **JavaScript/TypeScript**: ESLint + Prettier (configured)
+- **CSS**: Tailwind CSS conventions
+
+### Testing Requirements
+- Every code change must include corresponding tests
+- Run affected tests: `php artisan test --filter=SpecificTest`
+- Feature tests for full functionality, unit tests for isolated logic
+- Use model factories for test data setup
+
+## Key Development Guidelines
+
+### Laravel Boost Integration
+This project uses Laravel Boost MCP server with specialized tools:
+- **search-docs**: Search Laravel ecosystem documentation (use before coding)
+- **database-query**: Execute database queries for debugging
+- **tinker**: Run PHP code in Laravel context
+- **list-artisan-commands**: Check available Artisan commands
+- **browser-logs**: Read browser console logs for debugging
+
+### Error Handling Strategy
+- **Custom Error Pages**: Inertia error components in `resources/js/pages/errors/`
+- **Exception Handling**: Configured in `bootstrap/app.php`
+- **Development**: `php artisan pail` for real-time log monitoring
+
+### Performance Considerations
+- **Frontend**: Vite for fast HMR and optimized builds
+- **Backend**: Laravel's built-in caching and optimization
+- **Database**: Proper indexing and eager loading for location-based queries
+- **Assets**: Optimized image loading and lazy loading patterns
+
+### Security Practices
+- **Authentication**: Laravel Sanctum with proper token management
+- **CSRF Protection**: Built-in Laravel CSRF middleware
+- **Input Validation**: Form Request classes with comprehensive rules
+- **Environment**: Sensitive data in `.env`, never committed
+
+## Common Development Tasks
+
+### Creating New Features
+1. **Database**: `php artisan make:migration`, `php artisan make:model`
+2. **Backend Logic**: `php artisan make:controller`, `php artisan make:request`
+3. **Frontend**: Create React components in appropriate directories
+4. **Routes**: Add routes to appropriate route files
+5. **Tests**: `php artisan make:test --feature FeatureName`
+
+### Debugging Workflow
+1. **Backend Issues**: Use `php artisan pail` for logs, `tinker` tool for testing
+2. **Frontend Issues**: Browser dev tools, React Query devtools
+3. **Database Issues**: Use `database-query` tool or Laravel debugbar
+4. **Performance**: Laravel Telescope (if installed), browser performance tools
+
+### Building for Production
+```bash
+npm run build           # Build frontend assets
+composer install --no-dev --optimize-autoloader  # Optimize backend
+php artisan config:cache    # Cache configuration
+php artisan route:cache     # Cache routes
+php artisan view:cache      # Cache views
+```
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
@@ -8,7 +249,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.3.9
+- php - 8.3.10
 - inertiajs/inertia-laravel (INERTIA) - v2
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
