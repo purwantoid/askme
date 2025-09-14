@@ -19,11 +19,6 @@ export default {
     		}
     	},
     	extend: {
-    		spacing: {
-    			'0.5': '0.125rem',
-    			'2.5': '0.625rem',
-    			'3.5': '0.875rem'
-    		},
     		borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',

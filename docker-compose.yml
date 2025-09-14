@@ -100,6 +100,7 @@ services:
     platform: linux/amd64
     depends_on:
       - app
+      - react
     ports:
       - "${FORWARD_WEB_PORT:-81}:80"
     volumes:
@@ -118,16 +119,19 @@ services:
       - "host.docker.internal:host-gateway"
 
   react:
-    image: oven/bun:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
     platform: linux/amd64
-    working_dir: /var/www
     volumes:
       - .:/var/www:delegated
     ports:
       - "5173:5173"
-    command: sh -c "bun install && bun run dev --host 0.0.0.0"
-    stdin_open: true
-    tty: true
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /var/www
     dns:
       - 8.8.8.8
       - 9.9.9.9
