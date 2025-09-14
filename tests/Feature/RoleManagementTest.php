@@ -26,7 +26,7 @@ class RoleManagementTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('roles.index'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page->component('Roles/Index'));
+        $response->assertInertia(fn ($page) => $page->component('roles/Index'));
     }
 
     public function test_can_view_role_create_form()
@@ -34,7 +34,7 @@ class RoleManagementTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('roles.create'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page->component('Roles/Create'));
+        $response->assertInertia(fn ($page) => $page->component('roles/Create'));
     }
 
     public function test_can_create_role()
@@ -79,7 +79,7 @@ class RoleManagementTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn ($page) => $page
-            ->component('Roles/Show')
+            ->component('roles/Show')
             ->has('role.permissions', 1)
         );
     }
@@ -91,7 +91,7 @@ class RoleManagementTest extends TestCase
         $response = $this->actingAs($this->user)->get(route('roles.edit', $role));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page->component('Roles/Edit'));
+        $response->assertInertia(fn ($page) => $page->component('roles/Edit'));
     }
 
     public function test_can_update_role()
