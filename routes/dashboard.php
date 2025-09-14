@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +26,10 @@ Route::get('/products', fn () => Inertia::render('ecommerce/products'))->name('d
 Route::get('/products/edit', fn () => Inertia::render('ecommerce/product'))->name('dashboard.ecommerce.products.edit');
 Route::get('/tasks', fn () => Inertia::render('tasks/index'))->name('dashboard.tasks');
 Route::get('/users', fn () => Inertia::render('users/index'))->name('dashboard.users');
+
+Route::resource('/roles', RoleController::class);
+Route::resource('/permissions', PermissionController::class);
+
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
