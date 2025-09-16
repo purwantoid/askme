@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
         $permissions = Permission::query()->paginate(10);
 

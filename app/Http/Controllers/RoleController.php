@@ -11,9 +11,24 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index(): \Inertia\Response
+    public function index(Request $request): \Inertia\Response
     {
-        $roles = Role::with('permissions')->paginate(10);
+        $query = Role::query();
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%");
+            });
+        }
+
+        if ($request->sort_by) {
+            $direction = $request->sort_direction === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($request->sort_by, $direction);
+        } else {
+            $query->latest();
+        }
+
+        $perPage = $request->per_page ?? 10;
+        $roles = $query->paginate($perPage)->withQueryString();
         return Inertia::render('roles/index', [
             'roles' => $roles,
         ]);

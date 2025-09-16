@@ -22,7 +22,7 @@ class Permission extends Command
                                 {--O|oep}
                                 {--Y|yes-to-all}
                                 {--H|hard}';
-    protected $description = 'Generates permissions through Models or Filament Resources and custom permissions';
+    protected $description = 'Generates permissions through Models and custom permissions';
     private mixed $config;
     private array $permissions = [];
     private array $policies = [];
@@ -30,7 +30,7 @@ class Permission extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->config = config('filament-spatie-roles-permissions.generator');
+        $this->config = config('permission-generator.generator');
     }
 
     /**
@@ -40,7 +40,6 @@ class Permission extends Command
     public function handle(): void
     {
         $classes = $this->getAllModels();
-
         $classes = array_diff($classes, $this->getExcludedModels());
 
         // Only attempt to delete existing permissions if a deletion option is passed
@@ -55,13 +54,10 @@ class Permission extends Command
         }
 
         $this->prepareClassPermissionsAndPolicies($classes);
-
         $this->prepareCustomPermissions();
-
         $permissionModel = config('permission.models.permission');
 
         $count = 0;
-
         foreach ($this->permissions as $permission) {
             $this->comment('Syncing Permission for: ' . $permission['name']);
             $permissionModel::firstOrCreate($permission);
@@ -87,44 +83,14 @@ class Permission extends Command
     public function getModels(): array
     {
         $models = [];
-
-        if ($this->config['discover_models_through_filament_resources']) {
-            $resources = File::allFiles(app_path('Filament/Resources'));
-
-            foreach ($resources as $resource) {
-                $resourceNameSpace = $this->extractNamespace($resource);
-                $reflection = new ReflectionClass($resourceNameSpace . '\\' . $resource->getFilenameWithoutExtension());
-                if (
-                    !$reflection->isAbstract() && $reflection->getParentClass() &&
-                    $reflection->getParentClass()->getName() === 'Filament\Resources\Resource'
-                ) {
-                    $models[] = new ReflectionClass(app($resourceNameSpace . '\\' . $resource->getFilenameWithoutExtension())->getModel());
-                }
-            }
-        }
-
-        foreach ($this->config['model_directories'] as $directory) {
-            $models = array_merge($models, $this->getClassesInDirectory($directory));
-        }
-
+        $models = array_merge(
+            $models,
+            ...array_map(
+                fn($directory) => $this->getClassesInDirectory($directory),
+                $this->config['model_directories']
+            )
+        );
         return $models;
-    }
-
-    private function extractNamespace($file): string
-    {
-        $ns = '';
-        $handle = fopen($file, 'rb');
-        if ($handle) {
-            while (($line = fgets($handle)) !== false) {
-                if (preg_match('/namespace\s+([a-zA-Z0-9_\\\\]+);/', $line, $matches)) {
-                    $ns = $matches[1];
-                    break;
-                }
-            }
-            fclose($handle);
-        }
-
-        return $ns;
     }
 
     /**
@@ -136,7 +102,7 @@ class Permission extends Command
         $models = [];
 
         foreach ($files as $file) {
-            $namespace = $this->extractNamespace($file);
+            $namespace = $this->extractNamespace($file->getPathname());
             $class = $namespace . '\\' . $file->getFilenameWithoutExtension();
             $model = new ReflectionClass($class);
             if (!$model->isAbstract()) {
@@ -145,6 +111,23 @@ class Permission extends Command
         }
 
         return $models;
+    }
+
+    private function extractNamespace(string $filePathName): string
+    {
+        $ns = '';
+        $handle = fopen($filePathName, 'rb');
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                if (preg_match('/namespace\s+([a-zA-Z0-9_\\\\]+);/', $line, $matches)) {
+                    $ns = $matches[1];
+                    break;
+                }
+            }
+            fclose($handle);
+        }
+
+        return $ns;
     }
 
     private function getCustomModels(): array
@@ -228,9 +211,7 @@ class Permission extends Command
             }
 
             if ($this->option('policies') || $this->option('yes-to-all')) {
-
                 $user = $this->config['user_model_class'];
-
                 $policyVariables = [
                     'class' => $modelName . 'Policy',
                     'namespacedModel' => $model->getName(),
