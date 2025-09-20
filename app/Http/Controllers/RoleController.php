@@ -21,30 +21,6 @@ class RoleController extends Controller
         ]);
     }
 
-    public function store(StoreRoleRequest $request): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validated();
-        $role = Role::create(['name' => $validated['name']]);
-        if (!empty($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
-        }
-
-        return redirect()->route('roles.index')
-            ->with('success', 'Role created successfully.');
-    }
-
-    public function update(UpdateRoleRequest $request, Role $role): \Illuminate\Http\RedirectResponse
-    {
-        $validated = $request->validated();
-        $role->update(['name' => $validated['name']]);
-        if (isset($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
-        }
-
-        return redirect()->route('roles.index')
-            ->with('success', 'Role updated successfully.');
-    }
-
     public function destroy(Role $role): \Illuminate\Http\RedirectResponse
     {
         $role->delete();
