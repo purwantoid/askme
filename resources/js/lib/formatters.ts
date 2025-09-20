@@ -109,7 +109,7 @@ export function formatDateTime(raw: string | number | Date, isUtc = false) {
   if (!(date instanceof Date)) return "-"
 
   const dayjsDate = isUtc ? dayjs.utc(date) : dayjs(date)
-  return dayjsDate.format("YYYY-MM-DD hh:mm")
+  return dayjsDate.format("YYYY-MM-DD hh:mm:ss")
 }
 
 export function formatDate(raw: string | number | Date, isUtc = false) {
