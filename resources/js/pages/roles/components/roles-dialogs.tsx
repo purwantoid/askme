@@ -7,8 +7,8 @@ export function RolesDialogs() {
         <>
             <RolesActionDialog
                 key='role-add'
-                open={open === 'add'}
-                onOpenChange={() => setOpen('add')}
+                open={open === 'create'}
+                onOpenChange={() => setOpen('create')}
             />
 
             {currentRow && (

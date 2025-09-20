@@ -6,7 +6,7 @@ export function RolesButtons() {
     const {setOpen} = useRoles()
     return (
         <div className='flex gap-2'>
-            <Button className='space-x-1' onClick={() => setOpen('add')}>
+            <Button className='space-x-1' onClick={() => setOpen('create')}>
                 <span>Add Role</span> <IconUserPlus size={18} />
             </Button>
         </div>
