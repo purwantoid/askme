@@ -33,32 +33,6 @@ class RoleController extends Controller
             ->with('success', 'Role created successfully.');
     }
 
-    public function create(): \Inertia\Response
-    {
-        $permissions = Permission::all();
-        return Inertia::render('roles/create', [
-            'permissions' => $permissions,
-        ]);
-    }
-
-    public function show(Role $role): \Inertia\Response
-    {
-        $role->load('permissions', 'users');
-        return Inertia::render('roles/show', [
-            'role' => $role,
-        ]);
-    }
-
-    public function edit(Role $role): \Inertia\Response
-    {
-        $permissions = Permission::all();
-        $role->load('permissions');
-        return Inertia::render('roles/edit', [
-            'role' => $role,
-            'permissions' => $permissions,
-        ]);
-    }
-
     public function update(UpdateRoleRequest $request, Role $role): \Illuminate\Http\RedirectResponse
     {
         $validated = $request->validated();
