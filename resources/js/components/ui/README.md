@@ -1,4 +1,6 @@
 # DataTable Component
+https://raprmdn.dev/projects/laravel-inertia-datatable
+https://www.npmjs.com/package/@wandry/inertia-table
 
 A powerful, flexible data table component built with React Table v8 and shadcn/ui components. Supports pagination, sorting, filtering, column visibility, and more.
 
