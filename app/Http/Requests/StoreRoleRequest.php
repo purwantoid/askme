@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreRoleRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class StoreRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+            'name' => ['required', 'string', 'max:255'],
             'permissions' => ['array'],
             'permissions.*' => ['exists:permissions,id'],
         ];
@@ -40,5 +42,15 @@ class StoreRoleRequest extends FormRequest
             'name.unique' => 'A role with this name already exists.',
             'permissions.*.exists' => 'One or more selected permissions do not exist.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422)
+        );
     }
 }

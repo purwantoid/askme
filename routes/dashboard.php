@@ -38,3 +38,5 @@ Route::get('/help-center', fn() => Inertia::render('coming-soon/index'))->name('
 Route::get('/chat-ai', fn() => Inertia::render('playground/dashboard-03'))->name('dashboard.03');
 
 Route::get('/example', fn() => Inertia::render('roles/example'));
+Route::get('/permissions-list', [RoleController::class, 'permissions']);
+Route::post('/storek', [RoleController::class, 'storek']);
