@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\StoreRoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

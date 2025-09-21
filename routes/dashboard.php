@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Web\ProfileController;
+use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
