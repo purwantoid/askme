@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {Role} from "@/pages/roles/data/schema";
 import useDialogState from "@/hooks/use-dialog-state";
 
@@ -9,6 +9,8 @@ interface RolesContextType {
     setOpen: (open: RolesDialogType | null) => void;
     currentRow: Role | null;
     setCurrentRow: React.Dispatch<React.SetStateAction<Role | null>>;
+    shouldReload: boolean;
+    setShouldReload: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RolesContext = React.createContext<RolesContextType | null>(null);
@@ -20,8 +22,20 @@ interface Props {
 export default function RolesProvider({children}: Props) {
     const [open, setOpen] = useDialogState<RolesDialogType>(null);
     const [currentRow, setCurrentRow] = useState<Role | null>(null);
+    const [shouldReload, setShouldReload] = useState(false)
+    const value = useMemo(
+        () => ({
+            open,
+            setOpen,
+            currentRow,
+            setCurrentRow,
+            shouldReload,
+            setShouldReload,
+        }),
+        [open, currentRow, shouldReload]
+    );
     return (
-        <RolesContext.Provider value={{open, setOpen, currentRow, setCurrentRow}}>
+        <RolesContext.Provider value={value}>
             {children}
         </RolesContext.Provider>
     )

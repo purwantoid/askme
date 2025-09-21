@@ -1,5 +1,6 @@
 import {useRoles} from "@/pages/roles/context/roles-context";
 import {RolesActionDialog} from "@/pages/roles/components/roles-action-dialog";
+import {RolesDeleteDialog} from "@/pages/roles/components/roles-delete-dialog";
 
 export function RolesDialogs() {
     const {open, setOpen, currentRow, setCurrentRow} = useRoles()
@@ -18,6 +19,18 @@ export function RolesDialogs() {
                         open={open === 'edit'}
                         onOpenChange={() => {
                             setOpen('edit')
+                            setTimeout(() => {
+                                setCurrentRow(null)
+                            }, 500)
+                        }}
+                        currentRow={currentRow}
+                    />
+
+                    <RolesDeleteDialog
+                        key={`role-delete-${currentRow.id}`}
+                        open={open === 'delete'}
+                        onOpenChange={() => {
+                            setOpen('delete')
                             setTimeout(() => {
                                 setCurrentRow(null)
                             }, 500)

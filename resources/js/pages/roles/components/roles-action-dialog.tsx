@@ -23,6 +23,7 @@ import {Button} from "@/components/ui/button"
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import {Checkbox} from "@/components/ui/checkbox";
 import {ChevronDown, ChevronUp} from "lucide-react";
+import {useRoles} from "@/pages/roles/context/roles-context";
 
 const formSchema = z.object({
     name: z.string().min(1, {message: "Role name is required"}),
@@ -60,6 +61,7 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
 
     const [modules, setModules] = useState<Module[]>([])
     const [loading, setLoading] = useState(false)
+    const { setShouldReload } = useRoles()
     useEffect(() => {
         if (open) {
             setLoading(true)
@@ -155,6 +157,7 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
                         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4"><code className="text-white">{JSON.stringify(data, null, 2)}</code></pre>
                     ),
                 })
+                setShouldReload(true)
                 onOpenChange(false)
             })
             .catch((err) => {
@@ -246,7 +249,6 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
                                 </TabsList>
                                 <TabsContent value="all" className="space-y-4 mt-4">
                                     {loading ? (
-                                        // tampilkan loading
                                         <div className="flex justify-center items-center py-10">
                                             <span className="text-muted-foreground">Loading permissions...</span>
                                         </div>
