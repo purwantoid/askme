@@ -65,7 +65,7 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
     useEffect(() => {
         if (open) {
             setLoading(true)
-            fetch("/dashboard/permissions-list")
+            fetch("/dashboard/roles/permissions")
                 .then((res) => res.json())
                 .then((data: Record<string, Permission[]>) => {
                     const module: Module[] = Object.entries(data).map(([model, permissions]) => ({
@@ -139,7 +139,7 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
             permissions: selectedPermissions,
         }
 
-        fetch("/dashboard/storek", {
+        fetch("/dashboard/roles/store", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

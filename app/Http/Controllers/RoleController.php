@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\UpdateRoleRequest;
+use App\Http\Requests\Role\StoreRoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -39,14 +38,21 @@ class RoleController extends Controller
         return Inertia::render('roles/index');
     }
 
-    public function destroy(Role $role): \Illuminate\Http\RedirectResponse
+    public function destroy(int $id): JsonResponse
     {
-        $role->delete();
-        return redirect()->route('roles.index')
-            ->with('success', 'Role deleted successfully.');
+        try {
+            $role = Role::findOrFail($id);
+            $role->delete();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $ex) {
+            \Log::error($ex->getMessage());
+            return response()->json([
+                'success' => false,
+            ]);
+        }
     }
 
-    public function storek(StoreRoleRequest $request): JsonResponse
+    public function store(StoreRoleRequest $request): JsonResponse
     {
         try {
             $validated = $request->validated();

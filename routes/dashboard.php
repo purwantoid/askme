@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\PermissionController;
+declare(strict_types=1);
+
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
@@ -27,9 +28,7 @@ Route::get('/products/edit', fn() => Inertia::render('ecommerce/product'))->name
 Route::get('/tasks', fn() => Inertia::render('tasks/index'))->name('dashboard.tasks');
 Route::get('/users', fn() => Inertia::render('users/index'))->name('dashboard.users');
 
-Route::resource('/roles', RoleController::class);
 Route::get('/roles/{role}/accessible-urls', [RoleController::class, 'accessibleUrls'])->name('roles.accessible-urls');
-Route::resource('/permissions', PermissionController::class);
 
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -37,6 +36,9 @@ Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.
 Route::get('/help-center', fn() => Inertia::render('coming-soon/index'))->name('dashboard.coming-soon');
 Route::get('/chat-ai', fn() => Inertia::render('playground/dashboard-03'))->name('dashboard.03');
 
-Route::get('/example', fn() => Inertia::render('roles/example'));
-Route::get('/permissions-list', [RoleController::class, 'permissions']);
-Route::post('/storek', [RoleController::class, 'storek']);
+Route::group(['prefix' => '/roles'], static function () {
+    Route::get('/', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('/store', [RoleController::class, 'store'])->name('roles.store');
+    Route::delete('/delete/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::get('/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
+});

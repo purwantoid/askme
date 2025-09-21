@@ -5,6 +5,7 @@ import {toast} from "@/hooks/use-toast";
 import {ConfirmDialog} from "@/components/confirm-dialog";
 import {IconAlertTriangle} from "@tabler/icons-react";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {useRoles} from "@/pages/roles/context/roles-context";
 
 interface Props {
     currentRow?: Role
@@ -14,18 +15,33 @@ interface Props {
 
 export function RolesDeleteDialog({currentRow, open, onOpenChange}: Props) {
 
+    const { setShouldReload } = useRoles()
     const handleDelete = () => {
-        onOpenChange(false)
-        toast({
-            title: 'The following user has been deleted:',
-            description: (
-                <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>
-            {JSON.stringify(currentRow, null, 2)}
-          </code>
-        </pre>
-            ),
-        })
+        if (!currentRow) return
+
+        fetch('/dashboard/roles/delete/' + currentRow.id, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document
+                    .querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
+                    ?.content || '',
+            },
+        }).then((res) => res.json())
+            .then((data) => {
+                setShouldReload(true)
+                toast({title: 'The following user has been deleted:'})
+            })
+            .catch((err) => {
+                console.error(err)
+                toast({
+                    title: 'Error',
+                    description: 'Failed to delete role.',
+                    variant: 'destructive',
+                })
+            })
+            .finally(() => onOpenChange(false))
+
     }
 
     return (
@@ -34,8 +50,11 @@ export function RolesDeleteDialog({currentRow, open, onOpenChange}: Props) {
             onOpenChange={onOpenChange}
             handleConfirm={handleDelete}
             title={
-                <span className='text-destructive'><IconAlertTriangle className='mr-1 inline-block stroke-destructive'
-                                                                      size={18}/>{' '}Delete Role</span>
+                <span className='text-destructive'>
+                    <IconAlertTriangle
+                        className='mr-1 inline-block stroke-destructive'
+                        size={18}/>{' '}Delete Role
+                </span>
             }
             desc={
                 <div className='space-y-4'>
