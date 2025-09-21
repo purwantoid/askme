@@ -194,11 +194,6 @@ export const sidebarData: SidebarData = {
           url: '/dashboard/roles',
           icon: IconShieldCheck,
         },
-        {
-          title: 'Permissions',
-          url: '/dashboard/permissions',
-          icon: IconShield,
-        },
       ],
     },
     {
