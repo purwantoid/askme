@@ -14,6 +14,8 @@ import {
   IconPalette,
   IconServerOff,
   IconSettings,
+  IconShield,
+  IconShieldCheck,
   IconTool,
   IconUserCog,
   IconUserOff,
@@ -181,6 +183,21 @@ export const sidebarData: SidebarData = {
               icon: IconBarrierBlock,
             },
           ],
+        },
+      ],
+    },
+    {
+      title: 'Access Control',
+      items: [
+        {
+          title: 'Roles',
+          url: '/dashboard/roles',
+          icon: IconShieldCheck,
+        },
+        {
+          title: 'Permissions',
+          url: '/dashboard/permissions',
+          icon: IconShield,
         },
       ],
     },
