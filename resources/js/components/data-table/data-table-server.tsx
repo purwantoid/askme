@@ -119,9 +119,10 @@ export function DataTable<TData, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
+                                    className="odd:bg-background even:bg-muted/30 hover:bg-muted/50 transition-colors text-foreground"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="font-medium">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -131,7 +132,7 @@ export function DataTable<TData, TValue>({
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>
+                            <TableRow >
                                 <TableCell
                                     colSpan={columns.length}
                                     className="h-24 text-center"
