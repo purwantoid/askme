@@ -149,7 +149,6 @@ export function RolesActionDialog({currentRow, open, onOpenChange}: Props) {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
                 toast({
                     title: "Role saved successfully",
                     description: (

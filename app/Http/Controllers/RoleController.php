@@ -13,12 +13,30 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index(Request $request): \Inertia\Response
+    public function index(Request $request): \Inertia\Response|JsonResponse
     {
-        $roles = Role::with('permissions')->paginate(500);
-        return Inertia::render('roles/index', [
-            'roles' => $roles,
-        ]);
+        if ($request->wantsJson()) {
+            $query = Role::with('permissions');
+            if ($request->filled('name')) {
+                $query->where('name', 'like', '%' . $request->name . '%');
+            }
+
+            if ($request->filled('sort')) {
+                foreach (explode(',', $request->sort) as $sort) {
+                    [$column, $direction] = array_pad(explode(':', $sort), 2, 'asc');
+                    if (in_array($column, ['id', 'name', 'guard_name', 'created_at', 'updated_at'])) {
+                        $query->orderBy($column, $direction);
+                    }
+                }
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+
+            $perPage = $request->get('per_page', 5);
+            $roles = $query->paginate($perPage)->appends($request->query());
+            return response()->json($roles);
+        }
+        return Inertia::render('roles/index');
     }
 
     public function destroy(Role $role): \Illuminate\Http\RedirectResponse
@@ -26,24 +44,6 @@ class RoleController extends Controller
         $role->delete();
         return redirect()->route('roles.index')
             ->with('success', 'Role deleted successfully.');
-    }
-
-    public function permissions(): JsonResponse
-    {
-        $permissions = Permission::select(['id', 'name'])
-            ->where('guard_name', '=', 'web')
-            ->get();
-        $permissions = $permissions
-            ->groupBy(static fn($item) => Str::afterLast($item->name, ' '))
-            ->map(function ($items) {
-                return $items->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => Str::beforeLast($item->name, ' '),
-                    ];
-                })->sortBy('name')->values();
-            });
-        return response()->json($permissions);
     }
 
     public function storek(StoreRoleRequest $request): JsonResponse
@@ -68,5 +68,23 @@ class RoleController extends Controller
                 'success' => false,
             ]);
         }
+    }
+
+    public function permissions(): JsonResponse
+    {
+        $permissions = Permission::select(['id', 'name'])
+            ->where('guard_name', '=', 'web')
+            ->get();
+        $permissions = $permissions
+            ->groupBy(static fn($item) => Str::afterLast($item->name, ' '))
+            ->map(function ($items) {
+                return $items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => Str::beforeLast($item->name, ' '),
+                    ];
+                })->sortBy('name')->values();
+            });
+        return response()->json($permissions);
     }
 }
