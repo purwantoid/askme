@@ -19,7 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { DataTablePagination } from "@/components/data-table/data-table-pagination-server"
+import {DataTablePagination} from "@/components/data-table/data-table-pagination-server"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -33,7 +33,7 @@ interface DataTableProps<TData, TValue> {
     setSorting: (sorting: SortingState) => void
     filters: ColumnFiltersState
     setFilters: (filters: ColumnFiltersState) => void
-
+    loading?: boolean
     renderToolbar?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode
 }
 
@@ -49,6 +49,7 @@ export function DataTable<TData, TValue>({
                                              setSorting,
                                              filters,
                                              setFilters,
+                                             loading,
                                              renderToolbar,
                                          }: DataTableProps<TData, TValue>) {
     const [columnVisibility, setColumnVisibility] =
@@ -106,7 +107,14 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {data.length ? (
+                        {loading ? (<TableRow>
+                            <TableCell
+                                colSpan={columns.length}
+                                className="h-24 text-center text-muted-foreground"
+                            >
+                                Loading...
+                            </TableCell>
+                        </TableRow>) : data.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}

@@ -1,5 +1,5 @@
-import { AuthenticatedLayout } from '@/layouts'
-import { Main } from '@/components/layout/main'
+import {AuthenticatedLayout} from '@/layouts'
+import {Main} from '@/components/layout/main'
 import RolesProvider from './context/roles-context'
 import {DataTable} from '@/components/data-table/data-table-server'
 import {DataTableToolbar} from "@/pages/roles/components/table-toolbar"
@@ -7,9 +7,9 @@ import {RolesButtons} from "@/pages/roles/components/table-buttons";
 import {columns} from "@/pages/roles/components/table-columns"
 import {RolesDialogs} from "@/pages/roles/components/roles-dialogs";
 
-import { useEffect, useState } from "react"
-import { ColumnFiltersState, SortingState } from "@tanstack/react-table"
-import { Role } from "@/pages/roles/data/schema"
+import {useEffect, useState} from "react"
+import {ColumnFiltersState, SortingState} from "@tanstack/react-table"
+import {Role} from "@/pages/roles/data/schema"
 
 export default function RolesIndex() {
   const [data, setData] = useState<Role[]>([])
@@ -70,7 +70,8 @@ export default function RolesIndex() {
                   setSorting={setSorting}
                   filters={filters}
                   setFilters={setFilters}
-                  renderToolbar={(table) => <DataTableToolbar table={table} />}
+                  loading={loading}
+                  renderToolbar={(table) => <DataTableToolbar table={table}/>}
               />
             </div>
           </Main>
