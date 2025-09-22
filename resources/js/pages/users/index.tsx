@@ -10,7 +10,6 @@ import {users} from './data/users'
 import {DataTableToolbar} from './components/data-table-toolbar'
 
 export default function Users() {
-  // Parse user list
   const userList = userListSchema.parse(users)
 
   return (
