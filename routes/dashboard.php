@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Web\ProfileController;
+use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,7 +27,6 @@ Route::get('/orders', fn() => Inertia::render('ecommerce/orders'))->name('dashbo
 Route::get('/products', fn() => Inertia::render('ecommerce/products'))->name('dashboard.ecommerce.products');
 Route::get('/products/edit', fn() => Inertia::render('ecommerce/product'))->name('dashboard.ecommerce.products.edit');
 Route::get('/tasks', fn() => Inertia::render('tasks/index'))->name('dashboard.tasks');
-Route::get('/users', fn() => Inertia::render('users/index'))->name('dashboard.users');
 
 Route::get('/roles/{role}/accessible-urls', [RoleController::class, 'accessibleUrls'])->name('roles.accessible-urls');
 
@@ -41,4 +41,10 @@ Route::group(['prefix' => '/roles'], static function () {
     Route::post('/store', [RoleController::class, 'store'])->name('roles.store');
     Route::delete('/delete/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
     Route::get('/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
+});
+
+Route::group(['prefix' => '/users'], static function () {
+    Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::post('/store', [UserController::class, 'store'])->name('users.store');
+    Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });

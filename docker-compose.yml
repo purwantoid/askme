@@ -76,6 +76,48 @@ services:
     networks:
       - askme_network
 
+  postgres:
+    image: 'postgres:17.6'
+    platform: linux/amd64
+    ports:
+      - '${FORWARD_PGSQL_DB_PORT:-5432}:5432'
+    environment:
+      POSTGRES_DB: ${PGSQL_DB}
+      POSTGRES_USER: ${PGSQL_USER}
+      POSTGRES_PASSWORD: ${PGSQL_PASSWORD}
+    networks:
+      - askme_network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.6
+    platform: linux/amd64
+    command: start
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8080
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: true
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres/${PGSQL_DB}
+      KC_DB_USERNAME: ${PGSQL_USER}
+      KC_DB_PASSWORD: ${PGSQL_PASSWORD}
+      KEYCLOAK_IMPORT: /tmp/askme-realm.json
+    ports:
+      - '${FORWARD_KEYCLOAK_PORT:-8080}:8080'
+    depends_on:
+      - postgres
+    restart: always
+    volumes:
+      - ./infrastructure/keycloak/realm-export.json:/tmp/askme-realm.json
+    networks:
+      - askme_network
+
   meilisearch:
     image: 'getmeili/meilisearch:latest'
     platform: linux/amd64

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\StoreRoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -57,6 +58,7 @@ class RoleController extends Controller
         try {
             $validated = $request->validated();
             $role = Role::firstOrCreate([
+                'team_id' => 0,
                 'name' => $validated['name'],
                 'guard_name' => $validated['guard_name'] ?? 'web',
             ]);
