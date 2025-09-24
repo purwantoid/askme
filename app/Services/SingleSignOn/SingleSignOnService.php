@@ -26,7 +26,6 @@ class SingleSignOnService
             'kc_refresh_token_expiration' => Carbon::now()->addSeconds($keycloakUser->getRefreshExpiredIn()),
             'kc_session_id' => $keycloakUser->getSessionId(),
         ];
-        Log::error(self::FACILITY, 'User params' . var_export($userParams, true));
 
         $this->doAsyncRoleWithPermissions($keycloakUser);
         if ($findUser = User::where('email', $keycloakUser->getEmail())->first()) {
@@ -47,10 +46,12 @@ class SingleSignOnService
 
     protected function doAsyncRoleWithPermissions(SingleSignOnUser $keycloakUser): void
     {
+        Log::error(self::FACILITY, 'Do async role with permissions'.var_export($keycloakUser->getUserRaw(), true));
         foreach ($keycloakUser->getRoles() as $roleName) {
             Role::firstOrCreate([
                 'name' => $roleName,
                 'guard_name' => 'web',
+                'team_id' => 0,
             ]);
         }
     }

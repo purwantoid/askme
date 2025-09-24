@@ -69,13 +69,13 @@ export default function Authenticated({
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            type="button"
+                                            className="block w-full text-left"
+                                            onClick={() => { window.location.href = route('logout'); }}
                                         >
-                                            Log Out
-                                        </Dropdown.Link>
+                                            Log out
+                                        </button>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Services\SingleSignOn\SingleSignOnProvider;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -25,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
         Event::listen(static function (\SocialiteProviders\Manager\SocialiteWasCalled $event) {
-            $event->extendSocialite('keycloak', \SocialiteProviders\Keycloak\Provider::class);
+            $event->extendSocialite('keycloak', SingleSignOnProvider::class);
         });
     }
 }

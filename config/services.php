@@ -39,6 +39,7 @@ return [
         'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
         'redirect' => env('KEYCLOAK_REDIRECT_URI'),
         'base_url' => env('KEYCLOAK_BASE_URL'),
+        'public_base_url' => env('KEYCLOAK_PUBLIC_BASE_URL', env('KEYCLOAK_BASE_URL')),
         'realms' => env('KEYCLOAK_REALM')
     ],
 
