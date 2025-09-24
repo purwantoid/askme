@@ -58,7 +58,13 @@ export function ProfileDropdown() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Link className="block w-full text-left" href={route('logout')} method="post" as="button">Log out</Link>
+          <button
+              type="button"
+              className="block w-full text-left"
+              onClick={() => { window.location.href = route('logout'); }}
+          >
+            Log out
+          </button>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
