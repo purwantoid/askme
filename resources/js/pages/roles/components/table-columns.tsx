@@ -41,7 +41,7 @@ export const columns: ColumnDef<Role>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Name' />
+            <DataTableColumnHeader column={column} title='Role' />
         ),
         cell: ({ row }) => (
             <div className='w-fit text-nowrap'>{row.getValue('name')}</div>
