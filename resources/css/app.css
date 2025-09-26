@@ -143,7 +143,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: 
+        background:
             radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
             radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
             radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
@@ -186,7 +186,8 @@
     }
 
     @keyframes gradientShift {
-        0%, 100% {
+        0%,
+        100% {
             background-position: 0% 50%;
         }
         50% {
@@ -195,7 +196,8 @@
     }
 
     @keyframes float {
-        0%, 100% {
+        0%,
+        100% {
             transform: translateY(0px);
         }
         50% {
@@ -213,7 +215,8 @@
     }
 
     @keyframes glow {
-        0%, 100% {
+        0%,
+        100% {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
         50% {
@@ -222,7 +225,8 @@
     }
 
     @keyframes pulse-subtle {
-        0%, 100% {
+        0%,
+        100% {
             opacity: 1;
         }
         50% {
@@ -273,7 +277,9 @@
 
     /* Hover effects */
     .hover-lift {
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition:
+            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .hover-lift:hover {
@@ -292,7 +298,9 @@
 
     /* Custom shadows */
     .shadow-elegant {
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
     /* Loading spinner */
@@ -305,7 +313,6 @@
     .animate-spin-slow {
         animation: spin 2s linear infinite;
     }
-
 }
 
 @layer utilities {

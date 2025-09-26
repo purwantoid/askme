@@ -1,2 +1,2 @@
-export * as env from "./env"
-export * from "./payment"
+export * as env from './env';
+export * from './payment';

@@ -6,11 +6,11 @@ namespace App\Helpers;
 
 use App\Concerns\HasCheckResult;
 
-class GenericCheckResult
+final class GenericCheckResult
 {
     use HasCheckResult;
 
-    protected mixed $data = null;
+    private mixed $data = null;
 
     public function getData(): mixed
     {
@@ -20,6 +20,7 @@ class GenericCheckResult
     public function setData(mixed $data): self
     {
         $this->data = $data;
+
         return $this;
     }
 }

@@ -7,7 +7,9 @@ namespace App\Services\SingleSignOn;
 use App\Helpers\Environment;
 use SocialiteProviders\Keycloak\Provider;
 
-class SingleSignOnProvider extends Provider
+use function str_replace;
+
+final class SingleSignOnProvider extends Provider
 {
     public static function additionalConfigKeys(): array
     {
@@ -18,19 +20,21 @@ class SingleSignOnProvider extends Provider
     {
         $logoutUrl = parent::getLogoutUrl($redirectUri, $clientId, $idTokenHint, ...$additionalParameters);
         if (Environment::isLocal()) {
-            $publicBaseUrl = rtrim($this->getConfig('public_base_url'), '/');
-            $baseUrl = rtrim($this->getConfig('base_url'), '/');
-            $logoutUrl = \str_replace($baseUrl, $publicBaseUrl, $logoutUrl);
+            $publicBaseUrl = rtrim((string) $this->getConfig('public_base_url'), '/');
+            $baseUrl = rtrim((string) $this->getConfig('base_url'), '/');
+            $logoutUrl = str_replace($baseUrl, $publicBaseUrl, $logoutUrl);
         }
+
         return $logoutUrl;
     }
 
     protected function getAuthUrl($state): string
     {
         if (Environment::isLocal()) {
-            $publicBaseUrl = rtrim($this->getConfig('public_base_url'), '/');
-            $baseUrl = rtrim($this->getConfig('base_url'), '/');
-            return \str_replace($baseUrl, $publicBaseUrl, $this->buildAuthUrlFromBase($this->getBaseUrl() . '/protocol/openid-connect/auth', $state));
+            $publicBaseUrl = rtrim((string) $this->getConfig('public_base_url'), '/');
+            $baseUrl = rtrim((string) $this->getConfig('base_url'), '/');
+
+            return str_replace($baseUrl, $publicBaseUrl, $this->buildAuthUrlFromBase($this->getBaseUrl() . '/protocol/openid-connect/auth', $state));
         }
 
         return parent::getAuthUrl($state);

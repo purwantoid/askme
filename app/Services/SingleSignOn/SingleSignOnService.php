@@ -10,7 +10,9 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Spatie\Permission\Models\Role;
 
-class SingleSignOnService
+use function array_merge;
+
+final class SingleSignOnService
 {
     private const FACILITY = 'SINGLE_SIGN_ON_SERVICE';
 
@@ -32,21 +34,23 @@ class SingleSignOnService
             $findUser->update($userParams);
             $findUser->refresh();
             $findUser->assignRole($keycloakUser->getRoles());
+
             return $findUser;
         }
 
-        $newUser = User::create(\array_merge([
+        $newUser = User::create(array_merge([
             'name' => $keycloakUser->getName(),
             'email' => $keycloakUser->getEmail(),
             'password' => bcrypt(uniqid('', true)),
         ], $userParams));
         $newUser->assignRole($keycloakUser->getRoles());
+
         return $newUser;
     }
 
-    protected function doAsyncRoleWithPermissions(SingleSignOnUser $keycloakUser): void
+    private function doAsyncRoleWithPermissions(SingleSignOnUser $keycloakUser): void
     {
-        Log::error(self::FACILITY, 'Do async role with permissions'.var_export($keycloakUser->getUserRaw(), true));
+        Log::error(self::FACILITY, 'Do async role with permissions' . var_export($keycloakUser->getUserRaw(), true));
         foreach ($keycloakUser->getRoles() as $roleName) {
             Role::firstOrCreate([
                 'name' => $roleName,

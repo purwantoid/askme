@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use ReflectionClass;
-use ReflectionException;
-use Illuminate\Support\Str;
+use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Str;
+use ReflectionClass;
+use ReflectionException;
 
-class Permission extends Command
+final class Permission extends Command
 {
     protected $signature = 'permissions:sync
                                 {--C|clean}
@@ -22,10 +23,12 @@ class Permission extends Command
                                 {--O|oep}
                                 {--Y|yes-to-all}
                                 {--H|hard}';
+
     protected $description = 'Generates permissions through Models and custom permissions';
+
     private mixed $config;
+
     private array $permissions = [];
-    private array $policies = [];
 
     public function __construct()
     {
@@ -45,10 +48,11 @@ class Permission extends Command
         // Only attempt to delete existing permissions if a deletion option is passed
         if ($this->option('hard') || $this->option('clean')) {
             $deletionResult = $this->deleteExistingPermissions();
-            if (!$deletionResult) {
+            if (! $deletionResult) {
                 $this->line('<bg=yellow;options=bold;>*** OPERATION ABORTED ***</>');
                 $this->warn('No changes were made.');
                 $this->info('Consider running <bg=blue>php artisan permissions:sync</> if you just wish to sync without deleting.');
+
                 return;
             }
         }
@@ -83,68 +87,14 @@ class Permission extends Command
     public function getModels(): array
     {
         $models = [];
-        $models = array_merge(
+
+        return array_merge(
             $models,
             ...array_map(
-                fn($directory) => $this->getClassesInDirectory($directory),
+                fn ($directory): array => $this->getClassesInDirectory($directory),
                 $this->config['model_directories']
             )
         );
-        return $models;
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    private function getClassesInDirectory($path): array
-    {
-        $files = File::files($path);
-        $models = [];
-
-        foreach ($files as $file) {
-            $namespace = $this->extractNamespace($file->getPathname());
-            $class = $namespace . '\\' . $file->getFilenameWithoutExtension();
-            $model = new ReflectionClass($class);
-            if (!$model->isAbstract()) {
-                $models[] = $model;
-            }
-        }
-
-        return $models;
-    }
-
-    private function extractNamespace(string $filePathName): string
-    {
-        $ns = '';
-        $handle = fopen($filePathName, 'rb');
-        if ($handle) {
-            while (($line = fgets($handle)) !== false) {
-                if (preg_match('/namespace\s+([a-zA-Z0-9_\\\\]+);/', $line, $matches)) {
-                    $ns = $matches[1];
-                    break;
-                }
-            }
-            fclose($handle);
-        }
-
-        return $ns;
-    }
-
-    private function getCustomModels(): array
-    {
-        return $this->getModelReflections($this->config['custom_models']);
-    }
-
-    private function getModelReflections($array): array
-    {
-        return array_map(static function ($classes) {
-            return new \ReflectionClass($classes);
-        }, $array);
-    }
-
-    private function getExcludedModels(): array
-    {
-        return $this->getModelReflections($this->config['excluded_models']);
     }
 
     public function deleteExistingPermissions(): bool
@@ -158,9 +108,11 @@ class Permission extends Command
                     Schema::disableForeignKeyConstraints();
                     DB::table($permissionsTable)->truncate();
                     Schema::enableForeignKeyConstraints();
+
                     return true;
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->error($exception->getMessage());
+
                     return false;
                 }
             }
@@ -169,13 +121,16 @@ class Permission extends Command
                 $this->comment('Deleting Permissions');
                 try {
                     DB::table($permissionsTable)->delete();
+
                     return true;
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->error($exception->getMessage());
+
                     return false;
                 }
             }
         }
+
         return false;
     }
 
@@ -195,7 +150,7 @@ class Permission extends Command
 
             $contents = $filesystem->get($this->getStub());
 
-            foreach ($this->permissionAffixes() as $key => $permissionAffix) {
+            foreach (array_keys($this->permissionAffixes()) as $key) {
                 foreach ($this->guardNames() as $guardName) {
 
                     $permission = eval($this->config['permission_name']);
@@ -245,28 +200,6 @@ class Permission extends Command
         }
     }
 
-    protected function getStub(): string
-    {
-        return $this->resolveStubPath('/stubs/genericPolicy.stub');
-    }
-
-    protected function resolveStubPath($stub): string
-    {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-            ? $customPath
-            : __DIR__ . $stub;
-    }
-
-    private function permissionAffixes(): array
-    {
-        return $this->config['permission_affixes'];
-    }
-
-    private function guardNames(): array
-    {
-        return $this->config['guard_names'];
-    }
-
     public function prepareCustomPermissions(): void
     {
         foreach ($this->getCustomPermissions() as $customPermission) {
@@ -277,6 +210,80 @@ class Permission extends Command
                 ];
             }
         }
+    }
+
+    private function getStub(): string
+    {
+        return $this->resolveStubPath('/stubs/genericPolicy.stub');
+    }
+
+    private function resolveStubPath(string $stub): string
+    {
+        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+            ? $customPath
+            : __DIR__ . $stub;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function getClassesInDirectory($path): array
+    {
+        $files = File::files($path);
+        $models = [];
+
+        foreach ($files as $file) {
+            $namespace = $this->extractNamespace($file->getPathname());
+            $class = $namespace . '\\' . $file->getFilenameWithoutExtension();
+            $model = new ReflectionClass($class);
+            if (! $model->isAbstract()) {
+                $models[] = $model;
+            }
+        }
+
+        return $models;
+    }
+
+    private function extractNamespace(string $filePathName): string
+    {
+        $ns = '';
+        $handle = fopen($filePathName, 'rb');
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                if (preg_match('/namespace\s+([a-zA-Z0-9_\\\\]+);/', $line, $matches)) {
+                    $ns = $matches[1];
+                    break;
+                }
+            }
+            fclose($handle);
+        }
+
+        return $ns;
+    }
+
+    private function getCustomModels(): array
+    {
+        return $this->getModelReflections($this->config['custom_models']);
+    }
+
+    private function getModelReflections($array): array
+    {
+        return array_map(static fn ($classes): ReflectionClass => new ReflectionClass($classes), $array);
+    }
+
+    private function getExcludedModels(): array
+    {
+        return $this->getModelReflections($this->config['excluded_models']);
+    }
+
+    private function permissionAffixes(): array
+    {
+        return $this->config['permission_affixes'];
+    }
+
+    private function guardNames(): array
+    {
+        return $this->config['guard_names'];
     }
 
     private function getCustomPermissions(): array

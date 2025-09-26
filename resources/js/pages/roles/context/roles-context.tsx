@@ -1,6 +1,6 @@
-import React, {useState, useMemo} from 'react'
-import {Role} from "@/pages/roles/data/schema";
-import useDialogState from "@/hooks/use-dialog-state";
+import useDialogState from '@/hooks/use-dialog-state';
+import { Role } from '@/pages/roles/data/schema';
+import React, { useMemo, useState } from 'react';
 
 type RolesDialogType = 'create' | 'edit' | 'delete';
 
@@ -19,10 +19,10 @@ interface Props {
     children: React.ReactNode;
 }
 
-export default function RolesProvider({children}: Props) {
+export default function RolesProvider({ children }: Props) {
     const [open, setOpen] = useDialogState<RolesDialogType>(null);
     const [currentRow, setCurrentRow] = useState<Role | null>(null);
-    const [shouldReload, setShouldReload] = useState(false)
+    const [shouldReload, setShouldReload] = useState(false);
     const value = useMemo(
         () => ({
             open,
@@ -34,11 +34,7 @@ export default function RolesProvider({children}: Props) {
         }),
         [open, currentRow, shouldReload]
     );
-    return (
-        <RolesContext.Provider value={value}>
-            {children}
-        </RolesContext.Provider>
-    )
+    return <RolesContext.Provider value={value}>{children}</RolesContext.Provider>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -48,4 +44,4 @@ export const useRoles = () => {
         throw new Error('useRoles must be used within a RolesProvider');
     }
     return context;
-}
+};

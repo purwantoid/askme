@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-use App\Models\History;
 use App\Models\User;
 
-class HistoryPolicy
+final class HistoryPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, History $history): bool
+    public function view(User $user): bool
     {
         return $user->checkPermissionTo('view History');
     }
@@ -35,7 +35,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, History $history): bool
+    public function update(User $user): bool
     {
         return $user->checkPermissionTo('update History');
     }
@@ -43,7 +43,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, History $history): bool
+    public function delete(User $user): bool
     {
         return $user->checkPermissionTo('delete History');
     }
@@ -59,7 +59,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, History $history): bool
+    public function restore(User $user): bool
     {
         return $user->checkPermissionTo('restore History');
     }
@@ -75,7 +75,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can replicate the model.
      */
-    public function replicate(User $user, History $history): bool
+    public function replicate(User $user): bool
     {
         return $user->checkPermissionTo('replicate History');
     }
@@ -91,7 +91,7 @@ class HistoryPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, History $history): bool
+    public function forceDelete(User $user): bool
     {
         return $user->checkPermissionTo('force-delete History');
     }

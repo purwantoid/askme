@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -10,12 +12,13 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+final class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
-    use HasRoles;
+
     use HasPermissions;
+    use HasRoles;
     use Notifiable;
 
     /**
@@ -46,21 +49,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'kc_access_token_expiration' => 'datetime',
-            'kc_refresh_token_expiration' => 'datetime',
-        ];
-    }
 
     public function getKcUserId(): ?string
     {
@@ -95,5 +83,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getKcSessionId(): ?string
     {
         return $this->kc_session_id;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'kc_access_token_expiration' => 'datetime',
+            'kc_refresh_token_expiration' => 'datetime',
+        ];
     }
 }

@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\SocialiteDriver;
-use App\Helpers\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -11,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
-class AuthenticatedSessionController extends Controller
+final class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
@@ -47,6 +48,7 @@ class AuthenticatedSessionController extends Controller
 
         $logoutUrl = Socialite::driver(SocialiteDriver::Keycloak->value)
             ->getLogoutUrl(config('services.keycloak.redirect'), config('services.keycloak.client_id'), $user->getKcIdToken());
+
         return redirect()->away($logoutUrl);
     }
 }

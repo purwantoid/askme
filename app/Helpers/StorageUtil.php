@@ -12,18 +12,19 @@ use Storage;
 final class StorageUtil
 {
     private static array $instances = [];
-    protected readonly Filesystem $filesystem;
+
+    private readonly Filesystem $filesystem;
 
     private function __construct()
     {
         $this->filesystem = Storage::disk('s3');
     }
 
-    public static function getInstance(): StorageUtil
+    public static function getInstance(): self
     {
-        $cls = static::class;
-        if (!isset(self::$instances[$cls])) {
-            self::$instances[$cls] = new static();
+        $cls = self::class;
+        if (! isset(self::$instances[$cls])) {
+            self::$instances[$cls] = new self();
         }
 
         return self::$instances[$cls];
@@ -46,9 +47,10 @@ final class StorageUtil
 
     public function image(string $fileName, array|File|UploadedFile|null|string $file): bool|string
     {
-        if (!$this->filesystem->exists('images/' . $fileName)) {
+        if (! $this->filesystem->exists('images/' . $fileName)) {
             return $this->filesystem->put('images/' . $fileName, $file);
         }
+
         return true;
     }
 }

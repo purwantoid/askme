@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'generator' => [
 
@@ -50,7 +52,7 @@ return [
          */
         'model_directories' => [
             app_path('Models'),
-            //app_path('Domains/Forum')
+            // app_path('Domains/Forum')
         ],
 
         /*
@@ -68,17 +70,17 @@ return [
         ],
 
         'excluded_policy_models' => [
-            \App\Models\User::class,
+            App\Models\User::class,
         ],
 
         /*
          * Define any other permission that should be synced with the DB
          */
         'custom_permissions' => [
-            //'view-log'
+            // 'view-log'
         ],
 
-        'user_model' => \App\Models\User::class,
+        'user_model' => App\Models\User::class,
 
         'user_model_class' => 'User',
 

@@ -4,7 +4,4 @@ declare(strict_types=1);
 
 namespace App\Concerns;
 
-trait HasCheckResult
-{
-
-}
+trait HasCheckResult {}

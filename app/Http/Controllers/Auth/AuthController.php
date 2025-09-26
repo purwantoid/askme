@@ -17,18 +17,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
-class AuthController
+final readonly class AuthController
 {
     private const FACILITY = 'AUTH_CONTROLLER';
 
     public function __construct(
-        protected readonly SingleSignOnService $singleSignOnService
-    )
-    {
-    }
+        private SingleSignOnService $singleSignOnService
+    ) {}
 
-    public function callback(Request $request): RedirectResponse
+    public function callback(): RedirectResponse
     {
         try {
             $socialiteUser = Socialite::driver(SocialiteDriver::Keycloak->value)->user();
@@ -42,8 +41,9 @@ class AuthController
             Redis::set($sid, Session::getId());
 
             return redirect()->intended('/dashboard');
-        } catch (\Throwable $ex) {
-            Log::error(self::FACILITY, "Something wrong happened when attempt to handle keycloak callback", $ex);
+        } catch (Throwable $ex) {
+            Log::error(self::FACILITY, 'Something wrong happened when attempt to handle keycloak callback', $ex);
+
             return redirect()->route('login')->withErrors('Authentication failed.');
         }
     }
@@ -60,12 +60,12 @@ class AuthController
             $decodedToken = JWT::decode($logoutToken, new Key(config('services.keycloak.public_key'), 'RS256'));
 
             $sid = $decodedToken->sid ?? null;
-            if (!$sid) {
+            if (! $sid) {
                 return response()->json(['error' => 'Invalid logout token'], 400);
             }
 
             $sessionId = Redis::get($sid);
-            if (!$sessionId) {
+            if (! $sessionId) {
                 return response()->json(['error' => 'Session not found'], 404);
             }
 
@@ -74,8 +74,9 @@ class AuthController
             Redis::del($sid);
 
             return response()->json(['success' => true, 'session_id' => $sessionId]);
-        } catch (\Throwable $ex) {
-            Log::error(self::FACILITY, "Something wrong happened when attempt to logout from keycloak", $ex);
+        } catch (Throwable $ex) {
+            Log::error(self::FACILITY, 'Something wrong happened when attempt to logout from keycloak', $ex);
+
             return response()->json(['error' => $ex->getMessage()], 500);
         }
     }

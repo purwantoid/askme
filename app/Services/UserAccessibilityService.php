@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Spatie\Permission\Models\Permission;
 
-class UserAccessibilityService
+final class UserAccessibilityService
 {
     public function getAccessibleRoutes(?int $userId = null): array
     {
-        $user = $userId ? \App\Models\User::find($userId) : Auth::user();
+        $user = $userId !== null && $userId !== 0 ? \App\Models\User::find($userId) : Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -22,14 +23,16 @@ class UserAccessibilityService
 
         foreach ($routes as $route) {
             $name = $route->getName();
-
-            if (!$name || $this->shouldSkipRoute($name)) {
+            if (! $name) {
+                continue;
+            }
+            if ($this->shouldSkipRoute($name)) {
                 continue;
             }
 
             $requiredPermission = $this->getRequiredPermission($name);
 
-            if (!$requiredPermission || in_array($requiredPermission, $userPermissions)) {
+            if ($requiredPermission === null || $requiredPermission === '' || $requiredPermission === '0' || in_array($requiredPermission, $userPermissions)) {
                 $accessibleRoutes[] = [
                     'name' => $name,
                     'uri' => $route->uri(),
@@ -45,9 +48,9 @@ class UserAccessibilityService
 
     public function getInaccessibleRoutes(?int $userId = null): array
     {
-        $user = $userId ? \App\Models\User::find($userId) : Auth::user();
+        $user = $userId !== null && $userId !== 0 ? \App\Models\User::find($userId) : Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -57,14 +60,16 @@ class UserAccessibilityService
 
         foreach ($routes as $route) {
             $name = $route->getName();
-
-            if (!$name || $this->shouldSkipRoute($name)) {
+            if (! $name) {
+                continue;
+            }
+            if ($this->shouldSkipRoute($name)) {
                 continue;
             }
 
             $requiredPermission = $this->getRequiredPermission($name);
 
-            if ($requiredPermission && !in_array($requiredPermission, $userPermissions)) {
+            if ($requiredPermission && ! in_array($requiredPermission, $userPermissions)) {
                 $inaccessibleRoutes[] = [
                     'name' => $name,
                     'uri' => $route->uri(),
@@ -83,9 +88,7 @@ class UserAccessibilityService
         $accessibleRoutes = $this->getAccessibleRoutes($userId);
 
         // Filter only main navigation routes
-        $navigationRoutes = array_filter($accessibleRoutes, function ($route) {
-            return $this->isNavigationRoute($route['name']);
-        });
+        $navigationRoutes = array_filter($accessibleRoutes, fn (array $route): bool => $this->isNavigationRoute($route['name']));
 
         return $this->groupNavigationRoutes($navigationRoutes);
     }
@@ -112,7 +115,7 @@ class UserAccessibilityService
         return false;
     }
 
-    private function getRequiredPermission(string $routeName): ?string
+    private function getRequiredPermission(string $routeName): string
     {
         $actionMap = [
             'index' => 'view',
@@ -131,6 +134,7 @@ class UserAccessibilityService
             $action = $parts[1];
 
             $permissionAction = $actionMap[$action] ?? $action;
+
             return "{$permissionAction} {$resource}";
         }
 
@@ -161,13 +165,13 @@ class UserAccessibilityService
         $grouped = [];
 
         foreach ($routes as $route) {
-            $parts = explode('.', $route['name']);
+            $parts = explode('.', (string) $route['name']);
             $section = $parts[0];
 
-            if (!isset($grouped[$section])) {
+            if (! isset($grouped[$section])) {
                 $grouped[$section] = [
                     'name' => ucfirst($section),
-                    'routes' => []
+                    'routes' => [],
                 ];
             }
 

@@ -1,7 +1,4 @@
-import {DotsHorizontalIcon} from '@radix-ui/react-icons'
-import {Row} from '@tanstack/react-table'
-import {IconEdit, IconTrash} from '@tabler/icons-react'
-import {Button} from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,55 +6,55 @@ import {
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {useRoles} from '../context/roles-context'
-import {Role} from '../data/schema'
+} from '@/components/ui/dropdown-menu';
+import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { Row } from '@tanstack/react-table';
+import { useRoles } from '../context/roles-context';
+import { Role } from '../data/schema';
 
 interface DataTableRowActionsProps {
-    row: Row<Role>
+    row: Row<Role>;
 }
 
-export function DataTableRowActions({row}: DataTableRowActionsProps) {
-    const {setOpen, setCurrentRow} = useRoles()
+export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+    const { setOpen, setCurrentRow } = useRoles();
     return (
         <>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <Button
-                        variant='ghost'
-                        className='flex h-8 w-8 p-0 data-[state=open]:bg-muted'
-                    >
-                        <DotsHorizontalIcon className='h-4 w-4'/>
-                        <span className='sr-only'>Open menu</span>
+                    <Button variant="ghost" className="flex h-8 w-8 p-0 data-[state=open]:bg-muted">
+                        <DotsHorizontalIcon className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-[160px]'>
+                <DropdownMenuContent align="end" className="w-[160px]">
                     <DropdownMenuItem
                         onClick={() => {
-                            setCurrentRow(row.original)
-                            setOpen('edit')
+                            setCurrentRow(row.original);
+                            setOpen('edit');
                         }}
                     >
                         Edit
                         <DropdownMenuShortcut>
-                            <IconEdit size={16}/>
+                            <IconEdit size={16} />
                         </DropdownMenuShortcut>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator/>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem
                         onClick={() => {
-                            setCurrentRow(row.original)
-                            setOpen('delete')
+                            setCurrentRow(row.original);
+                            setOpen('delete');
                         }}
-                        className='!text-red-500'
+                        className="!text-red-500"
                     >
                         Delete
                         <DropdownMenuShortcut>
-                            <IconTrash size={16}/>
+                            <IconTrash size={16} />
                         </DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </>
-    )
+    );
 }
