@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Concerns;
 
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\Response;
 
 trait CanApiResponse
 {
@@ -22,7 +22,7 @@ trait CanApiResponse
                 'per_page' => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
                 'total_pages' => $paginator->lastPage(),
-            ]
+            ],
         ], Response::HTTP_OK);
     }
 

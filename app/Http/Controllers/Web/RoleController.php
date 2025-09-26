@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
@@ -8,10 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Log;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
-class RoleController extends Controller
+final class RoleController extends Controller
 {
     public function index(Request $request): \Inertia\Response|JsonResponse
     {
@@ -34,8 +38,10 @@ class RoleController extends Controller
 
             $perPage = $request->get('per_page', 5);
             $roles = $query->paginate($perPage)->appends($request->query());
+
             return response()->json($roles);
         }
+
         return Inertia::render('roles/index');
     }
 
@@ -44,9 +50,11 @@ class RoleController extends Controller
         try {
             $role = Role::findOrFail($id);
             $role->delete();
+
             return response()->json(['success' => true]);
-        } catch (\Throwable $ex) {
-            \Log::error($ex->getMessage());
+        } catch (Throwable $ex) {
+            Log::error($ex->getMessage());
+
             return response()->json([
                 'success' => false,
             ]);
@@ -70,8 +78,9 @@ class RoleController extends Controller
             }
 
             return response()->json(['success' => true]);
-        } catch (\Throwable $ex) {
-            \Log::error($ex->getMessage());
+        } catch (Throwable $ex) {
+            Log::error($ex->getMessage());
+
             return response()->json([
                 'success' => false,
             ]);
@@ -84,15 +93,12 @@ class RoleController extends Controller
             ->where('guard_name', '=', 'web')
             ->get();
         $permissions = $permissions
-            ->groupBy(static fn($item) => Str::afterLast($item->name, ' '))
-            ->map(function ($items) {
-                return $items->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => Str::beforeLast($item->name, ' '),
-                    ];
-                })->sortBy('name')->values();
-            });
+            ->groupBy(static fn ($item) => Str::afterLast($item->name, ' '))
+            ->map(fn ($items) => $items->map(fn ($item): array => [
+                'id' => $item->id,
+                'name' => Str::beforeLast($item->name, ' '),
+            ])->sortBy('name')->values());
+
         return response()->json($permissions);
     }
 }

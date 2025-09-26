@@ -1,16 +1,12 @@
-import {useRoles} from "@/pages/roles/context/roles-context";
-import {RolesActionDialog} from "@/pages/roles/components/roles-action-dialog";
-import {RolesDeleteDialog} from "@/pages/roles/components/roles-delete-dialog";
+import { RolesActionDialog } from '@/pages/roles/components/roles-action-dialog';
+import { RolesDeleteDialog } from '@/pages/roles/components/roles-delete-dialog';
+import { useRoles } from '@/pages/roles/context/roles-context';
 
 export function RolesDialogs() {
-    const {open, setOpen, currentRow, setCurrentRow} = useRoles()
+    const { open, setOpen, currentRow, setCurrentRow } = useRoles();
     return (
         <>
-            <RolesActionDialog
-                key='role-add'
-                open={open === 'create'}
-                onOpenChange={() => setOpen('create')}
-            />
+            <RolesActionDialog key="role-add" open={open === 'create'} onOpenChange={() => setOpen('create')} />
 
             {currentRow && (
                 <>
@@ -18,10 +14,10 @@ export function RolesDialogs() {
                         key={`role-edit-${currentRow.id}`}
                         open={open === 'edit'}
                         onOpenChange={() => {
-                            setOpen('edit')
+                            setOpen('edit');
                             setTimeout(() => {
-                                setCurrentRow(null)
-                            }, 500)
+                                setCurrentRow(null);
+                            }, 500);
                         }}
                         currentRow={currentRow}
                     />
@@ -30,15 +26,15 @@ export function RolesDialogs() {
                         key={`role-delete-${currentRow.id}`}
                         open={open === 'delete'}
                         onOpenChange={() => {
-                            setOpen('delete')
+                            setOpen('delete');
                             setTimeout(() => {
-                                setCurrentRow(null)
-                            }, 500)
+                                setCurrentRow(null);
+                            }, 500);
                         }}
                         currentRow={currentRow}
                     />
                 </>
             )}
         </>
-    )
+    );
 }

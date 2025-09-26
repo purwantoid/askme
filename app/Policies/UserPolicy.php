@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-
 use App\Models\User;
 
-class UserPolicy
+final class UserPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -21,7 +19,7 @@ class UserPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function view(User $user): bool
     {
         return $user->checkPermissionTo('view User');
     }
@@ -37,7 +35,7 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user): bool
     {
         return $user->checkPermissionTo('update User');
     }
@@ -45,7 +43,7 @@ class UserPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user): bool
     {
         return $user->checkPermissionTo('delete User');
     }
@@ -61,7 +59,7 @@ class UserPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, User $model): bool
+    public function restore(User $user): bool
     {
         return $user->checkPermissionTo('restore User');
     }
@@ -77,7 +75,7 @@ class UserPolicy
     /**
      * Determine whether the user can replicate the model.
      */
-    public function replicate(User $user, User $model): bool
+    public function replicate(User $user): bool
     {
         return $user->checkPermissionTo('replicate User');
     }
@@ -93,7 +91,7 @@ class UserPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, User $model): bool
+    public function forceDelete(User $user): bool
     {
         return $user->checkPermissionTo('force-delete User');
     }

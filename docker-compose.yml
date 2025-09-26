@@ -112,7 +112,6 @@ services:
       - '${FORWARD_KEYCLOAK_PORT:-8080}:8080'
     depends_on:
       - postgres
-    restart: always
     volumes:
       - ./infrastructure/keycloak/realm-export.json:/tmp/askme-realm.json
     networks:

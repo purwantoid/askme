@@ -4,28 +4,34 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
+use DateTimeImmutable;
+
+use function is_string;
+
 final class MicroDateUtil
 {
-    public static function addMicroSeconds(string|\DateTime $value, int $ms): \DateTime
+    public static function addMicroSeconds(string|DateTimeImmutable $value, int $ms): DateTimeImmutable
     {
         $date = self::normalize($value);
         $date->modify("$ms microseconds");
+
         return $date;
     }
 
-    public static function normalize(string|\DateTime $value): \DateTime
+    public static function normalize(string|DateTimeImmutable $value): DateTimeImmutable
     {
-        return new \DateTime(self::toString($value));
+        return new DateTimeImmutable(self::toString($value));
     }
 
-    public static function toString(string|\DateTime $value): string
+    public static function toString(string|DateTimeImmutable $value): string
     {
-        return (\is_string($value) ? new \DateTime($value) : $value)->format('Y-m-d H:i:s.u');
+        return (is_string($value) ? new DateTimeImmutable($value) : $value)->format('Y-m-d H:i:s.u');
     }
 
-    public static function getDuration(\DateTime $startTime, \DateTime $endTime = null): float
+    public static function getDuration(DateTimeImmutable $startTime, ?DateTimeImmutable $endTime = null): float
     {
-        $endTime = $endTime ?? (new \DateTime());
-        return (float)($endTime->format('U.u') - $startTime->format('U.u'));
+        $endTime ??= new DateTimeImmutable();
+
+        return (float) ($endTime->format('U.u') - $startTime->format('U.u'));
     }
 }

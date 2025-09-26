@@ -6,26 +6,39 @@ namespace App\Services\SingleSignOn;
 
 use Laravel\Socialite\Contracts\User;
 
-class SingleSignOnUser
+final class SingleSignOnUser
 {
-    protected string $id;
-    protected string $name;
-    protected string $email;
-    protected ?string $nickname = null;
-    protected ?string $avatar = null;
-    protected bool $emailVerified = false;
-    protected string $idToken;
-    protected string $accessToken;
-    protected ?string $refreshToken = null;
-    protected ?string $sessionId = null;
-    protected int $expiredIn = 0;
-    protected int $refreshExpiredIn = 0;
-    protected array $userRaw = [];
+    private string $id;
+
+    private string $name;
+
+    private string $email;
+
+    private ?string $nickname = null;
+
+    private ?string $avatar = null;
+
+    private bool $emailVerified = false;
+
+    private string $idToken;
+
+    private string $accessToken;
+
+    private ?string $refreshToken = null;
+
+    private ?string $sessionId = null;
+
+    private int $expiredIn = 0;
+
+    private int $refreshExpiredIn = 0;
+
+    private array $userRaw = [];
 
     public static function build(User $keycloakUser): self
     {
         $userRaw = $keycloakUser->getRaw() ?? [];
         $tokenDetail = $keycloakUser->accessTokenResponseBody ?? [];
+
         return (new self())
             ->setId($keycloakUser->getId())
             ->setName($keycloakUser->getName() ?? '')
@@ -33,13 +46,13 @@ class SingleSignOnUser
             ->setNickname($keycloakUser->getNickname())
             ->setAvatar($keycloakUser->getAvatar())
             ->setUserRaw($userRaw)
-            ->setEmailVerified((bool)($userRaw['email_verified'] ?? 0))
+            ->setEmailVerified((bool) ($userRaw['email_verified'] ?? 0))
             ->setIdToken($tokenDetail['id_token'] ?? '')
             ->setAccessToken($tokenDetail['access_token'] ?? '')
             ->setRefreshToken($tokenDetail['refresh_token'] ?? null)
             ->setSessionId($tokenDetail['session_state'] ?? null)
-            ->setExpiredIn((int)($tokenDetail['expires_in'] ?? 0))
-            ->setRefreshExpiredIn((int)($tokenDetail['refresh_expires_in'] ?? 0));
+            ->setExpiredIn((int) ($tokenDetail['expires_in'] ?? 0))
+            ->setRefreshExpiredIn((int) ($tokenDetail['refresh_expires_in'] ?? 0));
     }
 
     public function getId(): string
@@ -50,6 +63,7 @@ class SingleSignOnUser
     public function setId(string $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -61,6 +75,7 @@ class SingleSignOnUser
     public function setName(string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -72,6 +87,7 @@ class SingleSignOnUser
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -83,6 +99,7 @@ class SingleSignOnUser
     public function setNickname(?string $nickname): self
     {
         $this->nickname = $nickname;
+
         return $this;
     }
 
@@ -94,6 +111,7 @@ class SingleSignOnUser
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
+
         return $this;
     }
 
@@ -105,6 +123,7 @@ class SingleSignOnUser
     public function setEmailVerified(bool $emailVerified): self
     {
         $this->emailVerified = $emailVerified;
+
         return $this;
     }
 
@@ -116,6 +135,7 @@ class SingleSignOnUser
     public function setIdToken(string $idToken): self
     {
         $this->idToken = $idToken;
+
         return $this;
     }
 
@@ -127,6 +147,7 @@ class SingleSignOnUser
     public function setAccessToken(string $accessToken): self
     {
         $this->accessToken = $accessToken;
+
         return $this;
     }
 
@@ -138,6 +159,7 @@ class SingleSignOnUser
     public function setRefreshToken(?string $refreshToken): self
     {
         $this->refreshToken = $refreshToken;
+
         return $this;
     }
 
@@ -149,6 +171,7 @@ class SingleSignOnUser
     public function setSessionId(?string $sessionId): self
     {
         $this->sessionId = $sessionId;
+
         return $this;
     }
 
@@ -160,6 +183,7 @@ class SingleSignOnUser
     public function setExpiredIn(int $expiredIn): self
     {
         $this->expiredIn = $expiredIn;
+
         return $this;
     }
 
@@ -171,6 +195,7 @@ class SingleSignOnUser
     public function setRefreshExpiredIn(int $refreshExpiredIn): self
     {
         $this->refreshExpiredIn = $refreshExpiredIn;
+
         return $this;
     }
 
@@ -182,11 +207,12 @@ class SingleSignOnUser
     public function setUserRaw(array $userRaw): self
     {
         $this->userRaw = $userRaw;
+
         return $this;
     }
 
     public function getRoles(): array
     {
-        return $this->getUserRaw()['resource_access'][config('services.keycloak.client_id')]['roles'] ?? [];
+        return $this->userRaw['resource_access'][config('services.keycloak.client_id')]['roles'] ?? [];
     }
 }

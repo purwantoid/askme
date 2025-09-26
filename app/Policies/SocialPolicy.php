@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-use App\Models\Social;
 use App\Models\User;
 
-class SocialPolicy
+final class SocialPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class SocialPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Social $social): bool
+    public function view(User $user): bool
     {
         return $user->checkPermissionTo('view Social');
     }
@@ -35,7 +35,7 @@ class SocialPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Social $social): bool
+    public function update(User $user): bool
     {
         return $user->checkPermissionTo('update Social');
     }
@@ -43,7 +43,7 @@ class SocialPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Social $social): bool
+    public function delete(User $user): bool
     {
         return $user->checkPermissionTo('delete Social');
     }
@@ -59,7 +59,7 @@ class SocialPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Social $social): bool
+    public function restore(User $user): bool
     {
         return $user->checkPermissionTo('restore Social');
     }
@@ -75,7 +75,7 @@ class SocialPolicy
     /**
      * Determine whether the user can replicate the model.
      */
-    public function replicate(User $user, Social $social): bool
+    public function replicate(User $user): bool
     {
         return $user->checkPermissionTo('replicate Social');
     }
@@ -91,7 +91,7 @@ class SocialPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Social $social): bool
+    public function forceDelete(User $user): bool
     {
         return $user->checkPermissionTo('force-delete Social');
     }
