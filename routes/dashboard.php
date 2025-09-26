@@ -28,8 +28,6 @@ Route::get('/products', fn() => Inertia::render('ecommerce/products'))->name('da
 Route::get('/products/edit', fn() => Inertia::render('ecommerce/product'))->name('dashboard.ecommerce.products.edit');
 Route::get('/tasks', fn() => Inertia::render('tasks/index'))->name('dashboard.tasks');
 
-Route::get('/roles/{role}/accessible-urls', [RoleController::class, 'accessibleUrls'])->name('roles.accessible-urls');
-
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

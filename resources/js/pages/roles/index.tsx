@@ -27,7 +27,7 @@ function RolesIndex() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [filters, setFilters] = useState<ColumnFiltersState>([])
   const [loading, setLoading] = useState(false)
-  const { shouldReload, setShouldReload } = useRoles() // ✅ sekarang aman
+  const { shouldReload, setShouldReload } = useRoles()
 
   const fetchRoles = () => {
     setLoading(true)
