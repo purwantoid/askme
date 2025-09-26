@@ -60,12 +60,12 @@ final readonly class AuthController
             $decodedToken = JWT::decode($logoutToken, new Key(config('services.keycloak.public_key'), 'RS256'));
 
             $sid = $decodedToken->sid ?? null;
-            if (! $sid) {
+            if (!$sid) {
                 return response()->json(['error' => 'Invalid logout token'], 400);
             }
 
             $sessionId = Redis::get($sid);
-            if (! $sessionId) {
+            if (!$sessionId) {
                 return response()->json(['error' => 'Session not found'], 404);
             }
 

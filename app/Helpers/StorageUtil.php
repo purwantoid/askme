@@ -23,7 +23,7 @@ final class StorageUtil
     public static function getInstance(): self
     {
         $cls = self::class;
-        if (! isset(self::$instances[$cls])) {
+        if (!isset(self::$instances[$cls])) {
             self::$instances[$cls] = new self();
         }
 
@@ -47,7 +47,7 @@ final class StorageUtil
 
     public function image(string $fileName, array|File|UploadedFile|null|string $file): bool|string
     {
-        if (! $this->filesystem->exists('images/' . $fileName)) {
+        if (!$this->filesystem->exists('images/' . $fileName)) {
             return $this->filesystem->put('images/' . $fileName, $file);
         }
 

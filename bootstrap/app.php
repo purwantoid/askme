@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function ($response, Throwable $exception, Request $request) {
-            $shouldRenderError = ! app()->environment(['local', 'testing'])
+            $shouldRenderError = !app()->environment(['local', 'testing'])
               && in_array($response->getStatusCode(), [500, 503, 404, 403, 401]);
 
             if ($shouldRenderError) {

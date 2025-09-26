@@ -71,7 +71,7 @@ final class RoleController extends Controller
                 'guard_name' => $validated['guard_name'] ?? 'web',
             ]);
 
-            if (! empty($validated['permissions'])) {
+            if (!empty($validated['permissions'])) {
                 $role->syncPermissions($validated['permissions']);
             } else {
                 $role->permissions()->detach();

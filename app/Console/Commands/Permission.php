@@ -48,7 +48,7 @@ final class Permission extends Command
         // Only attempt to delete existing permissions if a deletion option is passed
         if ($this->option('hard') || $this->option('clean')) {
             $deletionResult = $this->deleteExistingPermissions();
-            if (! $deletionResult) {
+            if (!$deletionResult) {
                 $this->line('<bg=yellow;options=bold;>*** OPERATION ABORTED ***</>');
                 $this->warn('No changes were made.');
                 $this->info('Consider running <bg=blue>php artisan permissions:sync</> if you just wish to sync without deleting.');
@@ -236,7 +236,7 @@ final class Permission extends Command
             $namespace = $this->extractNamespace($file->getPathname());
             $class = $namespace . '\\' . $file->getFilenameWithoutExtension();
             $model = new ReflectionClass($class);
-            if (! $model->isAbstract()) {
+            if (!$model->isAbstract()) {
                 $models[] = $model;
             }
         }

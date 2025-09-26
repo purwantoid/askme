@@ -13,7 +13,7 @@ final class UserAccessibilityService
     {
         $user = $userId !== null && $userId !== 0 ? \App\Models\User::find($userId) : Auth::user();
 
-        if (! $user) {
+        if (!$user) {
             return [];
         }
 
@@ -23,7 +23,7 @@ final class UserAccessibilityService
 
         foreach ($routes as $route) {
             $name = $route->getName();
-            if (! $name) {
+            if (!$name) {
                 continue;
             }
             if ($this->shouldSkipRoute($name)) {
@@ -50,7 +50,7 @@ final class UserAccessibilityService
     {
         $user = $userId !== null && $userId !== 0 ? \App\Models\User::find($userId) : Auth::user();
 
-        if (! $user) {
+        if (!$user) {
             return [];
         }
 
@@ -60,7 +60,7 @@ final class UserAccessibilityService
 
         foreach ($routes as $route) {
             $name = $route->getName();
-            if (! $name) {
+            if (!$name) {
                 continue;
             }
             if ($this->shouldSkipRoute($name)) {
@@ -69,7 +69,7 @@ final class UserAccessibilityService
 
             $requiredPermission = $this->getRequiredPermission($name);
 
-            if ($requiredPermission && ! in_array($requiredPermission, $userPermissions)) {
+            if ($requiredPermission && !in_array($requiredPermission, $userPermissions)) {
                 $inaccessibleRoutes[] = [
                     'name' => $name,
                     'uri' => $route->uri(),
@@ -168,7 +168,7 @@ final class UserAccessibilityService
             $parts = explode('.', (string) $route['name']);
             $section = $parts[0];
 
-            if (! isset($grouped[$section])) {
+            if (!isset($grouped[$section])) {
                 $grouped[$section] = [
                     'name' => ucfirst($section),
                     'routes' => [],

@@ -17,7 +17,7 @@ final class DateTimeUtil
 
     public static function getCurrentTime(): DateTimeImmutable
     {
-        if (! self::$fixedTime instanceof DateTimeImmutable) {
+        if (!self::$fixedTime instanceof DateTimeImmutable) {
             $timezone = new DateTimeZone(config('app.timezone'));
 
             return new DateTimeImmutable(timezone: $timezone);

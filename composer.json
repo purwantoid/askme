@@ -68,6 +68,7 @@
             "pint --parallel",
             "npm run lint"
         ],
+        "pint": "pint --parallel",
         "test:type-coverage": "pest --type-coverage --min=100",
         "test:lint": [
             "pint --parallel --test",
