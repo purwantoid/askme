@@ -29,6 +29,11 @@ final class UserController extends Controller
                 $query->where('name', 'like', '%' . $request->name . '%');
             }
 
+            if ($request->filled('status')) {
+                $statuses = explode(',', $request->status);
+                $query->whereIn('status', $statuses);
+            }
+
             if ($request->filled('sort')) {
                 foreach (explode(',', $request->sort) as $sort) {
                     [$column, $direction] = array_pad(explode(':', $sort), 2, 'asc');
