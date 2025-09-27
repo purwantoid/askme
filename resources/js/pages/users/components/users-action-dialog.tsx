@@ -1,74 +1,28 @@
 'use client';
 
-import { PasswordInput } from '@/components/password-input';
-import { SelectDropdown } from '@/components/select-dropdown';
+import { MultiSelect, MultiSelectOption } from '@/components/multi-select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import { useUsers } from '@/pages/users/context/users-context';
+import { statuses } from '@/pages/users/data/data';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { userTypes } from '../data/data';
 import { User } from '../data/schema';
 
-const formSchema = z
-    .object({
-        firstName: z.string().min(1, { message: 'First Name is required.' }),
-        lastName: z.string().min(1, { message: 'Last Name is required.' }),
-        username: z.string().min(1, { message: 'Username is required.' }),
-        phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
-        email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Email is invalid.' }),
-        password: z.string().transform((pwd) => pwd.trim()),
-        role: z.string().min(1, { message: 'Role is required.' }),
-        confirmPassword: z.string().transform((pwd) => pwd.trim()),
-        isEdit: z.boolean(),
-    })
-    .superRefine(({ isEdit, password, confirmPassword }, ctx) => {
-        if (!isEdit || (isEdit && password !== '')) {
-            if (password === '') {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Password is required.',
-                    path: ['password'],
-                });
-            }
-
-            if (password.length < 8) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Password must be at least 8 characters long.',
-                    path: ['password'],
-                });
-            }
-
-            if (!password.match(/[a-z]/)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Password must contain at least one lowercase letter.',
-                    path: ['password'],
-                });
-            }
-
-            if (!password.match(/\d/)) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: 'Password must contain at least one number.',
-                    path: ['password'],
-                });
-            }
-
-            if (password !== confirmPassword) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    message: "Passwords don't match.",
-                    path: ['confirmPassword'],
-                });
-            }
-        }
-    });
+const formSchema = z.object({
+    name: z.string().min(1, { message: 'fullname is required.' }),
+    email: z.string().min(1, { message: 'Email is required.' }).email({ message: 'Email is invalid.' }),
+    roles: z.array(z.string()).optional(),
+    status: z.string(),
+    isEdit: z.boolean(),
+});
 type UserForm = z.infer<typeof formSchema>;
 
 interface Props {
@@ -79,42 +33,97 @@ interface Props {
 
 export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     const isEdit = !!currentRow;
+    const [roleOptions, setRoleOptions] = useState<MultiSelectOption[]>([]);
+    const [selectedValues, setSelectedValues] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const { setShouldReload } = useUsers();
+
+    useEffect(() => {
+        if (open) {
+            setLoading(true);
+            fetch('/dashboard/users/roles')
+                .then((res) => res.json())
+                .then((data: { id: string; name: string }[]) => {
+                    const options: MultiSelectOption[] = data.map((role) => ({
+                        label: role.name,
+                        value: role.id,
+                    }));
+                    setRoleOptions(options);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [open]);
+
+    useEffect(() => {
+        if (roleOptions.length === 0) return;
+        const inits: string[] = [];
+        roleOptions.forEach((r) => {
+            currentRow?.roles.forEach((cr) => {
+                if (r.value === cr.id) {
+                    inits.push(r.value);
+                }
+            });
+        });
+        setSelectedValues(inits);
+    }, [roleOptions, isEdit, currentRow, loading]);
+
     const form = useForm<UserForm>({
         resolver: zodResolver(formSchema),
         defaultValues: isEdit
             ? {
                   ...currentRow,
-                  password: '',
-                  confirmPassword: '',
+                  roles: currentRow.roles.map((r) => r.id),
                   isEdit,
               }
             : {
-                  firstName: '',
-                  lastName: '',
-                  username: '',
+                  name: '',
                   email: '',
-                  role: '',
-                  phoneNumber: '',
-                  password: '',
-                  confirmPassword: '',
+                  status: 'active',
+                  roles: [],
                   isEdit,
               },
     });
 
     const onSubmit = (values: UserForm) => {
         form.reset();
-        toast({
-            title: 'You submitted the following values:',
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-                </pre>
-            ),
-        });
-        onOpenChange(false);
+        const payload = {
+            ...values,
+            roles: selectedValues.map((v) => Number(v)).filter((n) => !isNaN(n)),
+        };
+        fetch('/dashboard/users/store', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+            },
+            body: JSON.stringify(payload),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                toast({
+                    title: 'User saved successfully',
+                    description: (
+                        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+                            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+                        </pre>
+                    ),
+                });
+                setShouldReload(true);
+                setSelectedValues([]);
+                onOpenChange(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                toast({
+                    title: 'Error',
+                    description: 'Failed to save role.',
+                    variant: 'destructive',
+                });
+            });
     };
-
-    const isPasswordTouched = !!form.formState.dirtyFields.password;
 
     return (
         <Dialog
@@ -124,7 +133,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 onOpenChange(state);
             }}
         >
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="flex max-w-2xl flex-col">
                 <DialogHeader className="text-left">
                     <DialogTitle>{isEdit ? 'Edit User' : 'Add New User'}</DialogTitle>
                     <DialogDescription>
@@ -132,15 +141,28 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                         Click save when you&apos;re done.
                     </DialogDescription>
                 </DialogHeader>
-                <ScrollArea className="-mr-4 h-[26.25rem] w-full py-1 pr-4">
+                <ScrollArea className="-mr-4 w-full flex-1 py-1 pr-4">
                     <Form {...form}>
                         <form id="user-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-0.5">
                             <FormField
                                 control={form.control}
-                                name="firstName"
+                                name="email"
                                 render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">First Name</FormLabel>
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="john.doe@gmail.com" className="col-span-4" {...field} disabled={isEdit} />
+                                        </FormControl>
+                                        <FormMessage className="col-span-4 col-start-3" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Fullname</FormLabel>
                                         <FormControl>
                                             <Input placeholder="John" className="col-span-4" autoComplete="off" {...field} />
                                         </FormControl>
@@ -150,104 +172,45 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                             />
                             <FormField
                                 control={form.control}
-                                name="lastName"
+                                name="roles"
                                 render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Last Name</FormLabel>
+                                    <FormItem>
+                                        <FormLabel>Role</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Doe" className="col-span-4" autoComplete="off" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="username"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="john_doe" className="col-span-4" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Email</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="john.doe@gmail.com" className="col-span-4" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="phoneNumber"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Phone Number</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="+123456789" className="col-span-4" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="role"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Role</FormLabel>
-                                        <SelectDropdown
-                                            defaultValue={field.value}
-                                            onValueChange={field.onChange}
-                                            placeholder="Select a role"
-                                            className="col-span-4"
-                                            items={userTypes.map(({ label, value }) => ({
-                                                label,
-                                                value,
-                                            }))}
-                                        />
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Password</FormLabel>
-                                        <FormControl>
-                                            <PasswordInput placeholder="e.g., S3cur3P@ssw0rd" className="col-span-4" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="col-span-4 col-start-3" />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="confirmPassword"
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-6 items-center gap-x-4 gap-y-1 space-y-0">
-                                        <FormLabel className="col-span-2 text-right">Confirm Password</FormLabel>
-                                        <FormControl>
-                                            <PasswordInput
-                                                disabled={!isPasswordTouched}
-                                                placeholder="e.g., S3cur3P@ssw0rd"
-                                                className="col-span-4"
+                                            <MultiSelect
+                                                variant="secondary"
+                                                options={roleOptions}
+                                                responsive={true}
+                                                onValueChange={setSelectedValues}
+                                                defaultValue={selectedValues}
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormMessage className="col-span-4 col-start-3" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="status"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Status</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="User status" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {statuses.map(({ label, value }) => (
+                                                    <SelectItem key={value} value={value}>
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

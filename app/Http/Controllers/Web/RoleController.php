@@ -66,7 +66,7 @@ final class RoleController extends Controller
         try {
             $validated = $request->validated();
             $role = Role::firstOrCreate([
-                'team_id' => 0,
+                'team_id' => 12,
                 'name' => $validated['name'],
                 'guard_name' => $validated['guard_name'] ?? 'web',
             ]);

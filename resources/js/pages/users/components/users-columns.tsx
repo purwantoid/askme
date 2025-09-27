@@ -2,10 +2,11 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import LongText from '@/components/long-text';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { formatDateTime } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { callTypes, userTypes } from '../data/data';
-import { User } from '../data/schema';
+import { Role, User } from '../data/schema';
 import { DataTableRowActions } from './data-table-row-actions';
 
 export const columns: ColumnDef<User>[] = [
@@ -37,9 +38,9 @@ export const columns: ColumnDef<User>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'username',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Username" />,
-        cell: ({ row }) => <LongText className="max-w-36">{row.getValue('username')}</LongText>,
+        accessorKey: 'name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+        cell: ({ row }) => <LongText className="max-w-36">{row.getValue('name')}</LongText>,
         meta: {
             className: cn(
                 'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)] lg:drop-shadow-none',
@@ -50,25 +51,9 @@ export const columns: ColumnDef<User>[] = [
         enableHiding: false,
     },
     {
-        id: 'fullName',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => {
-            const { firstName, lastName } = row.original;
-            const fullName = `${firstName} ${lastName}`;
-            return <LongText className="max-w-36">{fullName}</LongText>;
-        },
-        meta: { className: 'w-36' },
-    },
-    {
         accessorKey: 'email',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
         cell: ({ row }) => <div className="w-fit text-nowrap">{row.getValue('email')}</div>,
-    },
-    {
-        accessorKey: 'phoneNumber',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Phone Number" />,
-        cell: ({ row }) => <div>{row.getValue('phoneNumber')}</div>,
-        enableSorting: false,
     },
     {
         accessorKey: 'status',
@@ -91,28 +76,52 @@ export const columns: ColumnDef<User>[] = [
         enableSorting: false,
     },
     {
-        accessorKey: 'role',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+        accessorKey: 'roles',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Roles" />,
         cell: ({ row }) => {
-            const { role } = row.original;
-            const userType = userTypes.find(({ value }) => value === role);
+            const { roles } = row.original; // ⬅️ ini array of Role
 
-            if (!userType) {
-                return null;
+            if (!roles || roles.length === 0) {
+                return <span className="text-sm text-muted-foreground">-</span>;
             }
 
             return (
-                <div className="flex items-center gap-x-2">
-                    {userType.icon && <userType.icon size={16} className="text-muted-foreground" />}
-                    <span className="text-sm capitalize">{row.getValue('role')}</span>
+                <div className="flex flex-wrap gap-2">
+                    {roles.map((role) => {
+                        const userType = userTypes.find(({ value }) => value === role.name);
+
+                        return (
+                            <div key={role.id} className="flex items-center gap-x-1 rounded bg-muted px-2 py-1">
+                                {userType?.icon && <userType.icon size={14} className="text-muted-foreground" />}
+                                <span className="text-xs capitalize">{role.name}</span>
+                            </div>
+                        );
+                    })}
                 </div>
             );
         },
         filterFn: (row, id, value) => {
-            return value.includes(row.getValue(id));
+            const roles: Role[] = row.getValue(id);
+            return roles.some((r) => value.includes(r.name));
         },
         enableSorting: false,
         enableHiding: false,
+    },
+    {
+        accessorKey: 'created_at',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        cell: ({ row }) => {
+            return <div className="w-fit text-nowrap">{formatDateTime(row.getValue('created_at'))}</div>;
+        },
+        meta: { className: 'w-36' },
+    },
+    {
+        accessorKey: 'updated_at',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+        cell: ({ row }) => {
+            return <div className="w-fit text-nowrap">{formatDateTime(row.getValue('updated_at'))}</div>;
+        },
+        meta: { className: 'w-36' },
     },
     {
         id: 'actions',

@@ -8,6 +8,29 @@ export const callTypes = new Map<UserStatus, string>([
     ['suspended', 'bg-destructive/10 dark:bg-destructive/50 text-destructive dark:text-primary border-destructive/10'],
 ]);
 
+export const statuses = [
+    {
+        label: 'Active',
+        value: 'active',
+        icon: IconShield,
+    },
+    {
+        label: 'Inactive',
+        value: 'inactive',
+        icon: IconUserShield,
+    },
+    {
+        label: 'Invited',
+        value: 'invited',
+        icon: IconUsersGroup,
+    },
+    {
+        label: 'Suspend',
+        value: 'suspended',
+        icon: IconCash,
+    },
+];
+
 export const userTypes = [
     {
         label: 'Superadmin',
