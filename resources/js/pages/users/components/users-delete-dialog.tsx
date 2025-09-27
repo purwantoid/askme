@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { useUsers } from '@/pages/users/context/users-context';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { User } from '../data/schema';
@@ -17,19 +18,33 @@ interface Props {
 
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     const [value, setValue] = useState('');
+    const { setShouldReload } = useUsers();
 
     const handleDelete = () => {
-        if (value.trim() !== currentRow.username) return;
+        if (!currentRow) return;
+        if (value.trim() !== currentRow.email) return;
 
-        onOpenChange(false);
-        toast({
-            title: 'The following user has been deleted:',
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(currentRow, null, 2)}</code>
-                </pre>
-            ),
-        });
+        fetch('/dashboard/users/delete/' + currentRow.id, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setShouldReload(true);
+                toast({ title: 'The following user has been deleted:' });
+            })
+            .catch((err) => {
+                console.error(err);
+                toast({
+                    title: 'Error',
+                    description: 'Failed to delete user.',
+                    variant: 'destructive',
+                });
+            })
+            .finally(() => onOpenChange(false));
     };
 
     return (
@@ -37,7 +52,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
             open={open}
             onOpenChange={onOpenChange}
             handleConfirm={handleDelete}
-            disabled={value.trim() !== currentRow.username}
+            disabled={value.trim() !== currentRow.email}
             title={
                 <span className="text-destructive">
                     <IconAlertTriangle className="mr-1 inline-block stroke-destructive" size={18} /> Delete User
@@ -46,15 +61,14 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
             desc={
                 <div className="space-y-4">
                     <p className="mb-2">
-                        Are you sure you want to delete <span className="font-bold">{currentRow.username}</span>?
+                        Are you sure you want to delete <span className="font-bold">{currentRow.email}</span>?
                         <br />
-                        This action will permanently remove the user with the role of{' '}
-                        <span className="font-bold">{currentRow.role.toUpperCase()}</span> from the system. This cannot be undone.
+                        This action will permanently remove the user.
                     </p>
 
                     <Label className="my-2">
-                        Username:
-                        <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter username to confirm deletion." />
+                        Email:
+                        <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter email to confirm deletion." />
                     </Label>
 
                     <Alert variant="destructive">

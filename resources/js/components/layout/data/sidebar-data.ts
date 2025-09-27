@@ -159,7 +159,7 @@ export const sidebarData: SidebarData = {
                         },
                         {
                             title: 'Users',
-                            url: '/dashboard/users',
+                            url: '/dashboard/example/users',
                             icon: IconUsers,
                         },
                     ],

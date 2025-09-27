@@ -34,6 +34,8 @@ Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.
 Route::get('/help-center', fn () => Inertia::render('coming-soon/index'))->name('dashboard.coming-soon');
 Route::get('/chat-ai', fn () => Inertia::render('playground/dashboard-03'))->name('dashboard.03');
 
+Route::get('/example/users', static fn () => Inertia::render('example/users/index'));
+
 Route::group(['prefix' => '/roles'], static function () {
     Route::get('/', [RoleController::class, 'index'])->name('roles.index');
     Route::post('/store', [RoleController::class, 'store'])->name('roles.store');
@@ -45,4 +47,5 @@ Route::group(['prefix' => '/users'], static function () {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
     Route::post('/store', [UserController::class, 'store'])->name('users.store');
     Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/roles', [UserController::class, 'roles'])->name('users.roles');
 });
