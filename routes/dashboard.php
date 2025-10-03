@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Web\ProfileController;
-use App\Http\Controllers\Web\RoleController;
-use App\Http\Controllers\Web\UserController;
+use App\Http\Controllers\Dashboard\PriorityController;
+use App\Http\Controllers\Dashboard\ProfileController;
+use App\Http\Controllers\Dashboard\RoleController;
+use App\Http\Controllers\Dashboard\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,6 +42,10 @@ Route::group(['prefix' => '/roles'], static function () {
     Route::post('/store', [RoleController::class, 'store'])->name('roles.store');
     Route::delete('/delete/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
     Route::get('/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
+});
+
+Route::group(['prefix' => '/priority'], static function () {
+    Route::get('/', [PriorityController::class, 'index'])->name('priority.index');
 });
 
 Route::group(['prefix' => '/users'], static function () {
