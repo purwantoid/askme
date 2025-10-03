@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { useUsers } from '@/pages/users/context/users-context';
+import { usePage } from '@inertiajs/react';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { User } from '../data/schema';
@@ -19,6 +20,7 @@ interface Props {
 export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     const [value, setValue] = useState('');
     const { setShouldReload } = useUsers();
+    const { csrf_token } = usePage().props as unknown as { csrf_token: string };
 
     const handleDelete = () => {
         if (!currentRow) return;
@@ -28,7 +30,7 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                'X-CSRF-TOKEN': csrf_token,
             },
         })
             .then((res) => res.json())

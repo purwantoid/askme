@@ -1,12 +1,14 @@
 services:
   app:
-    image: purwantogz/php:8.3.1-phpunit
+    image: purwantogz/php:8.4.4-phpunit
     platform: linux/amd64
     depends_on:
       - mysql
       - mailpit
       - meilisearch
       - redis
+    ports:
+      - "5173:5173"
     environment:
       TZ: "Asia/Jakarta"
       ENV_TYPE: "developer"
@@ -32,7 +34,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   worker:
-    image: purwantogz/php:8.3.1-phpunit
+    image: purwantogz/php:8.4.4-phpunit
     platform: linux/amd64
     depends_on:
       - mysql
@@ -141,7 +143,6 @@ services:
     platform: linux/amd64
     depends_on:
       - app
-      - react
     ports:
       - "${FORWARD_WEB_PORT:-81}:80"
     volumes:
@@ -159,27 +160,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  react:
-    build:
-      context: .
-      dockerfile: Dockerfile.ui
-    platform: linux/amd64
-    volumes:
-      - .:/var/www:delegated
-    ports:
-      - "5173:5173"
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: /var/www
-    dns:
-      - 8.8.8.8
-      - 9.9.9.9
-    networks:
-      - askme_network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   redis:
     image: 'redis:alpine'

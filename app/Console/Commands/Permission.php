@@ -150,10 +150,10 @@ final class Permission extends Command
 
             $contents = $filesystem->get($this->getStub());
 
-            foreach (array_keys($this->permissionAffixes()) as $key) {
+            foreach ($this->permissionAffixes() as $key => $permissionAffix) {
                 foreach ($this->guardNames() as $guardName) {
 
-                    $permission = eval($this->config['permission_name']);
+                    $permission = $this->getPermissionName($permissionAffix, $modelName);
                     $this->permissions[] = [
                         'name' => $permission,
                         'guard_name' => $guardName,
@@ -212,6 +212,11 @@ final class Permission extends Command
         }
     }
 
+    protected function getPermissionName(string $permissionAffix, string $modelName): string
+    {
+        return $permissionAffix . ' ' . $modelName;
+    }
+
     private function getStub(): string
     {
         return $this->resolveStubPath('/stubs/genericPolicy.stub');
@@ -219,7 +224,7 @@ final class Permission extends Command
 
     private function resolveStubPath(string $stub): string
     {
-        return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
+        return file_exists($customPath = $this->laravel->basePath(mb_trim($stub, '/')))
             ? $customPath
             : __DIR__ . $stub;
     }

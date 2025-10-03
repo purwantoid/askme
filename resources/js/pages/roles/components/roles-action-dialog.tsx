@@ -13,6 +13,7 @@ import { toast } from '@/hooks/use-toast';
 import { useRoles } from '@/pages/roles/context/roles-context';
 import { Permission, Role } from '@/pages/roles/data/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -39,6 +40,7 @@ type Module = {
 
 export function RolesActionDialog({ currentRow, open, onOpenChange }: Props) {
     const isEdit = !!currentRow;
+    const { csrf_token } = usePage().props as unknown as { csrf_token: string };
     const form = useForm<RoleForm>({
         resolver: zodResolver(formSchema),
         defaultValues: isEdit
@@ -135,7 +137,7 @@ export function RolesActionDialog({ currentRow, open, onOpenChange }: Props) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                'X-CSRF-TOKEN': csrf_token,
             },
             body: JSON.stringify(payload),
         })
@@ -233,7 +235,7 @@ export function RolesActionDialog({ currentRow, open, onOpenChange }: Props) {
                                         modules.map((m) => {
                                             const isOpen = openMap[m.model];
                                             return (
-                                                <Collapsible key={m.model} open={isOpen || true} onOpenChange={(v) => toggleModuleOpen(m.model, v)}>
+                                                <Collapsible key={m.model} open={isOpen || false} onOpenChange={(v) => toggleModuleOpen(m.model, v)}>
                                                     <Card>
                                                         <div className="flex items-center justify-between border-b px-4 py-3">
                                                             <CollapsibleTrigger asChild>

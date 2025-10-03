@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/hooks/use-toast';
 import { useRoles } from '@/pages/roles/context/roles-context';
 import { Role } from '@/pages/roles/data/schema';
+import { usePage } from '@inertiajs/react';
 import { IconAlertTriangle } from '@tabler/icons-react';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 export function RolesDeleteDialog({ currentRow, open, onOpenChange }: Props) {
     const { setShouldReload } = useRoles();
+    const { csrf_token } = usePage().props as unknown as { csrf_token: string };
     const handleDelete = () => {
         if (!currentRow) return;
 
@@ -22,7 +24,7 @@ export function RolesDeleteDialog({ currentRow, open, onOpenChange }: Props) {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                'X-CSRF-TOKEN': csrf_token,
             },
         })
             .then((res) => res.json())

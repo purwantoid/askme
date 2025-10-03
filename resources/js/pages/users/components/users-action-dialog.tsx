@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { useUsers } from '@/pages/users/context/users-context';
 import { statuses } from '@/pages/users/data/data';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,6 +34,7 @@ interface Props {
 
 export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     const isEdit = !!currentRow;
+    const { csrf_token } = usePage().props as unknown as { csrf_token: string };
     const [roleOptions, setRoleOptions] = useState<MultiSelectOption[]>([]);
     const [selectedValues, setSelectedValues] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
@@ -97,7 +99,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+                'X-CSRF-TOKEN': csrf_token,
             },
             body: JSON.stringify(payload),
         })
