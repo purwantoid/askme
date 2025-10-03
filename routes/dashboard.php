@@ -46,6 +46,8 @@ Route::group(['prefix' => '/roles'], static function () {
 
 Route::group(['prefix' => '/priority'], static function () {
     Route::get('/', [PriorityController::class, 'index'])->name('priority.index');
+    Route::post('/store', [PriorityController::class, 'store'])->name('roles.store');
+    Route::delete('/delete/{id}', [PriorityController::class, 'destroy'])->name('roles.destroy');
 });
 
 Route::group(['prefix' => '/users'], static function () {
