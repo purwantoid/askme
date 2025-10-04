@@ -64,6 +64,16 @@ export const sidebarData: SidebarData = {
             ],
         },
         {
+            title: 'Administration',
+            items: [
+                {
+                    title: 'Priority',
+                    url: '/dashboard/priority',
+                    icon: IconChecklist,
+                },
+            ],
+        },
+        {
             title: 'Access Control',
             items: [
                 {
