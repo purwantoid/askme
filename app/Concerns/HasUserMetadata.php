@@ -10,11 +10,11 @@ use Carbon\Carbon;
 
 trait HasUserMetadata
 {
-    public static function bootUserMetadata(): void
+    public static function bootHasUserMetadata(): void
     {
         static::creating(static function ($model) {
-            if ($model->isFillable('creator')) {
-                $model->creator = UserUtil::getCurrentUserId();
+            if ($model->isFillable('created_by')) {
+                $model->created_by = UserUtil::getCurrentUserId();
             }
             if ($model->isFillable('created_at')) {
                 $model->created_at = Carbon::now();
@@ -22,8 +22,8 @@ trait HasUserMetadata
         });
 
         static::updating(static function ($model) {
-            if ($model->isFillable('updator')) {
-                $model->updator = UserUtil::getCurrentUserId();
+            if ($model->isFillable('updated_by')) {
+                $model->updated_by = UserUtil::getCurrentUserId();
             }
             if ($model->isFillable('updated_at')) {
                 $model->updated_at = Carbon::now();
@@ -31,17 +31,23 @@ trait HasUserMetadata
         });
     }
 
-    public function creator(): string
+    public function creator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        $creator = $this->belongsTo(User::class, 'creator', 'id');
-
-        return $creator->first()?->name ?? 'System';
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function updator(): string
+    public function updator(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        $updator = $this->belongsTo(User::class, 'updator', 'id');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
 
-        return $updator->first()?->name ?? 'System';
+    public function getCreatorNameAttribute(): string
+    {
+        return $this->creator?->name ?? 'System';
+    }
+
+    public function getUpdatorNameAttribute(): string
+    {
+        return $this->updator?->name ?? '-';
     }
 }

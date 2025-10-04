@@ -6,6 +6,8 @@ const PrioritySchema = z.object({
     name: z.string(),
     value: z.number(),
     status: z.string(),
+    creator: z.string(),
+    updater: z.string(),
     created_at: z.string().datetime(),
     updated_at: z.string().datetime(),
 });

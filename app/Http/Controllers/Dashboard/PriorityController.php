@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Dashboard;
 
-use App\Enums\ItemStatus;
 use App\Helpers\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Dashboard\Priority\PriorityRequest;
 use App\Http\Resources\PriorityResource;
-use App\Http\Resources\UserResource;
 use App\Models\Priority;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,9 +22,14 @@ class PriorityController extends Controller
     public function index(Request $request): Response|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         if ($request->wantsJson()) {
-            $query = Priority::query();
+            $query = Priority::with(['creator', 'updator']);
             if ($request->filled('name')) {
                 $query->where('name', 'like', '%' . $request->name . '%');
+            }
+
+            if ($request->filled('status')) {
+                $statuses = explode(',', $request->status);
+                $query->whereIn('status', $statuses);
             }
 
             if ($request->filled('sort')) {
@@ -53,11 +56,20 @@ class PriorityController extends Controller
     {
         try {
             $validated = $request->validated();
-            Priority::query()->firstOrCreate([
-                'name' => $validated['name'],
-                'value' => (float) ($validated['value'] ?? 0.00),
-                'enabled' => $validated['status'] === ItemStatus::Active->value ? 1 : 0,
-            ]);
+            $priority = Priority::query()->where('name', $validated['name'])->first();
+            if (!$priority) {
+                Priority::query()->create([
+                    'name' => $validated['name'],
+                    'value' => (float) ($validated['value'] ?? 0.00),
+                    'status' => $validated['status'],
+                ]);
+            } else {
+                Priority::query()->update([
+                    'name' => $validated['name'],
+                    'value' => (float) ($validated['value'] ?? 0.00),
+                    'status' => $validated['status'],
+                ]);
+            }
 
             return response()->json(['success' => true]);
         } catch (Throwable $ex) {

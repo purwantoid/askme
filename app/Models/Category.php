@@ -18,12 +18,12 @@ class Category extends Model
 
     protected $table = 'categories';
 
-    protected $fillable = ['name', 'description', 'enabled', 'priority_id', 'creator', 'updator'];
+    protected $fillable = ['name', 'description', 'enabled', 'priority_id', 'created_by', 'updated_by'];
 
     protected $hidden = ['pivot'];
 
     public function priority(): BelongsTo
     {
-        return $this->belongsTo(Priority::class);
+        return $this->belongsTo(Priority::class, 'priority_id', 'id');
     }
 }

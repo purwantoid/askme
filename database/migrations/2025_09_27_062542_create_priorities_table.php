@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\ItemStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,9 +18,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', 16)->unique();
             $table->float('value')->unique();
-            $table->boolean('enabled')->default(true);
-            $table->bigInteger('creator')->nullable(false);
-            $table->bigInteger('updator')->nullable();
+            $table->enum('status', ItemStatus::cases())->default(ItemStatus::Inactive->value);
+            $table->bigInteger('created_by')->nullable(false);
+            $table->bigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

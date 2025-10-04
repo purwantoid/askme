@@ -15,7 +15,7 @@ class PriorityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255','unique:priorities'],
             'value' => ['required', 'numeric'],
             'status' => ['required', Rule::enum(ItemStatus::class)],
         ];

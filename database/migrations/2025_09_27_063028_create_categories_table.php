@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('name', 16)->unique(); // Nama prioritas seperti high, medium, low
             $table->float('value')->unique(); // Nilai prioritas seperti 1, 2, 3
             $table->boolean('enabled')->default(true);
-            $table->bigInteger('creator')->nullable(false);
-            $table->bigInteger('updator')->nullable();
+            $table->bigInteger('created_by')->nullable(false);
+            $table->bigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

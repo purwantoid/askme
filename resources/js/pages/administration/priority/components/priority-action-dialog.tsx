@@ -146,7 +146,7 @@ export function PriorityActionDialog({ currentRow, open, onOpenChange }: Props) 
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="User status" />
+                                                    <SelectValue placeholder="Status" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>

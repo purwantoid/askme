@@ -82,11 +82,23 @@ export const columns: ColumnDef<Priority>[] = [
         meta: { className: 'w-36' },
     },
     {
+        accessorKey: 'creator',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Created By" />,
+        cell: ({ row }) => <div className="w-fit text-nowrap">{row.getValue('creator')}</div>,
+        meta: { className: 'w-36' },
+    },
+    {
         accessorKey: 'updated_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
         cell: ({ row }) => {
             return <div className="w-fit text-nowrap">{formatDateTime(row.getValue('updated_at'))}</div>;
         },
+        meta: { className: 'w-36' },
+    },
+    {
+        accessorKey: 'updater',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Updated By" />,
+        cell: ({ row }) => <div className="w-fit text-nowrap">{row.getValue('updater')}</div>,
         meta: { className: 'w-36' },
     },
     {

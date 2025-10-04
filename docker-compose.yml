@@ -5,7 +5,6 @@ services:
     depends_on:
       - mysql
       - mailpit
-      - meilisearch
       - redis
     ports:
       - "5173:5173"
@@ -39,7 +38,6 @@ services:
     depends_on:
       - mysql
       - mailpit
-      - meilisearch
       - redis
     environment:
       TZ: "Asia/Jakarta"
@@ -116,16 +114,6 @@ services:
       - postgres
     volumes:
       - ./infrastructure/keycloak/realm-export.json:/tmp/askme-realm.json
-    networks:
-      - askme_network
-
-  meilisearch:
-    image: 'getmeili/meilisearch:latest'
-    platform: linux/amd64
-    ports:
-      - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
-    environment:
-      MEILI_NO_ANALYTICS: '${MEILISEARCH_NO_ANALYTICS:-false}'
     networks:
       - askme_network
 

@@ -15,7 +15,7 @@ class Priority extends Model
     use HasUserMetadata;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'value', 'enabled', 'creator', 'updator'];
+    protected $fillable = ['name', 'value', 'status', 'created_by', 'updated_by'];
 
     protected $table = 'priorities';
 }
