@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Log;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Throwable;
 
 final class RoleController extends Controller

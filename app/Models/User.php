@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Packages\Teams\HasTeams;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasPermissions;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Str;
 
 final class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
-
-    use HasPermissions;
-    use HasRoles;
+    use HasTeams;
     use Notifiable;
     use SoftDeletes;
 
@@ -101,5 +99,17 @@ final class User extends Authenticatable implements MustVerifyEmail
             'kc_access_token_expiration' => 'datetime',
             'kc_refresh_token_expiration' => 'datetime',
         ];
+    }
+
+    /**
+     * Get the user's initials
+     */
+    public function initials(): string
+    {
+        return Str::of($this->name)
+            ->explode(' ')
+            ->take(2)
+            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->implode('');
     }
 }
