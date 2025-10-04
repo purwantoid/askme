@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Http\Resources\AuthenticatedUserResource;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -31,10 +32,14 @@ final class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? AuthenticatedUserResource::make($user->load(
+                    'teams:id,name,owner_id',
+                    'currentTeam:id,name,owner_id',
+                )) : null,
             ],
             'csrf_token' => csrf_token(),
         ];

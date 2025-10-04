@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Observers\UserObserver;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
+#[ObservedBy(UserObserver::class)]
 final class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -53,39 +57,39 @@ final class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    public function getKcUserId(): ?string
+    public function gravatar(): Attribute
     {
-        return $this->kc_user_id;
+        return Attribute::make(fn () => $this->avatar());
     }
 
-    public function getKcIdToken(): ?string
+    public function teams(): Relations\BelongsToMany
     {
-        return $this->kc_id_token;
+        return $this->belongsToMany(Team::class)->withTimestamps();
     }
 
-    public function getKcAccessToken(): ?string
+    public function currentTeam(): Relations\BelongsTo
     {
-        return $this->kc_access_token;
+        return $this->belongsTo(Team::class, 'current_team_id');
     }
 
-    public function getKcRefreshToken(): ?string
+    public function ownedTeam(): Relations\HasOne
     {
-        return $this->kc_refresh_token;
+        return $this->hasOne(Team::class, 'owner_id');
     }
 
-    public function getKcExpiredId(): ?Carbon
+    public function ownedTeams(): Relations\HasMany
     {
-        return $this->kc_access_token_expiration;
+        return $this->hasMany(Team::class, 'owner_id');
     }
 
-    public function getKcRefreshExpiredId(): ?Carbon
+    public function latestOwnTeam(): Relations\HasOne
     {
-        return $this->kc_refresh_token_expiration;
+        return $this->ownedTeams()->one()->latestOfMany();
     }
 
-    public function getKcSessionId(): ?string
+    protected function avatar($size = 200): string
     {
-        return $this->kc_session_id;
+        return 'https://www.gravatar.com/avatar/' . md5(mb_strtolower(mb_trim($this->email))) . '?s=' . $size . '&d=mp';
     }
 
     /**

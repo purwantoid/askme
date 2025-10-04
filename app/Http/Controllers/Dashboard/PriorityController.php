@@ -11,6 +11,7 @@ use App\Http\Resources\PriorityResource;
 use App\Models\Priority;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -21,6 +22,7 @@ class PriorityController extends Controller
 
     public function index(Request $request): Response|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
+        Gate::authorize('view', Priority::class);
         if ($request->wantsJson()) {
             $query = Priority::with(['creator', 'updator']);
             if ($request->filled('name')) {
@@ -54,6 +56,10 @@ class PriorityController extends Controller
 
     public function store(PriorityRequest $request): JsonResponse
     {
+        if (!Gate::any(['create', 'update'], Priority::class)) {
+            abort(403, 'You are not authorized to view or update this priority.');
+        }
+
         try {
             $validated = $request->validated();
             $priority = Priority::query()->where('name', $validated['name'])->first();
@@ -83,6 +89,7 @@ class PriorityController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
+        Gate::authorize('delete', Priority::class);
         try {
             $priority = Priority::query()->findOrFail($id);
             $priority->delete();

@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use Illuminate\Auth\Access\Response;
-
+use App\Models\Team;
 use App\Models\User;
 
-class UserPolicy
+class TeamPolicy
 {
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function view(User $user, Team $team): bool
     {
-        return $user->checkPermissionTo('view User');
+        return $user->checkPermissionTo('view Team');
     }
 
     /**
@@ -24,22 +24,22 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->checkPermissionTo('create User');
+        return $user->checkPermissionTo('create Team');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, Team $team): bool
     {
-        return $user->checkPermissionTo('update User');
+        return $user->checkPermissionTo('update Team');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, Team $team): bool
     {
-        return $user->checkPermissionTo('delete User');
+        return $user->checkPermissionTo('delete Team');
     }
 }

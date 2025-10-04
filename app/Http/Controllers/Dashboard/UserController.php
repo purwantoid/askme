@@ -13,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 use Throwable;
 
 final class UserController extends Controller
@@ -23,7 +22,6 @@ final class UserController extends Controller
     public function index(Request $request): \Inertia\Response|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         if ($request->wantsJson()) {
-            app(PermissionRegistrar::class)->setPermissionsTeamId(12);
             $query = User::with('roles');
             if ($request->filled('name')) {
                 $query->where('name', 'like', '%' . $request->name . '%');
@@ -57,7 +55,6 @@ final class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse
     {
         try {
-            app(PermissionRegistrar::class)->setPermissionsTeamId(12);
             $validated = $request->validated();
             $email = $validated['email'];
             $user = User::where('email', $email)->first();
@@ -92,7 +89,6 @@ final class UserController extends Controller
 
     public function roles(): JsonResponse
     {
-        app(PermissionRegistrar::class)->setPermissionsTeamId(12);
         $roles = Role::select(['id', 'name'])
             ->where('guard_name', '=', 'web')
             ->get();

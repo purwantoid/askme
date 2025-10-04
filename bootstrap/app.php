@@ -18,13 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             App\Http\Middleware\HandleInertiaRequests::class,
             Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            App\Http\Middleware\TeamPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function ($response, Throwable $exception, Request $request) {
-            $shouldRenderError = !app()->environment(['local', 'testing'])
-              && in_array($response->getStatusCode(), [500, 503, 404, 403, 401]);
-
+            $shouldRenderError = in_array((int) $response->getStatusCode(), [500, 503, 404, 403, 401], true);
+            App\Helpers\Log::error('ERROR_HANDLER', "Something went wrong went access, url: {$request->url()}", $exception);
             if ($shouldRenderError) {
                 $errorComponents = [
                     '401' => 'errors/unauthorized-error',
