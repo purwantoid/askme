@@ -148,7 +148,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-
   redis:
     image: 'redis:alpine'
     ports:
