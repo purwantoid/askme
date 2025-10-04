@@ -28,3 +28,4 @@ yarn-error.log
 /.zed
 /.claude
 /logs/php-xdebug.log
+/app/Console/Commands/Local.php
