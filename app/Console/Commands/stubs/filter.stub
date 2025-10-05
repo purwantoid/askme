@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use App\Contracts\AbstractFilter;
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }} extends AbstractFilter
+{
+    /**
+     * Filter by name (example filter method).
+     * URL: ?name=john
+     */
+    public function name(Builder $builder, mixed $value): Builder
+    {
+        return $builder->where('name', 'like', '%' . $value . '%');
+    }
+
+}
