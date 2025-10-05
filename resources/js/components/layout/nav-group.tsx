@@ -10,6 +10,7 @@ import {
     SidebarMenuSubItem,
     useSidebar,
 } from '@/components/ui/sidebar';
+import { Menu, MenuGroup } from '@/types/menu';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -22,9 +23,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { NavCollapsible, NavItem, NavLink, type NavGroup } from './types';
 
-export function NavGroup({ title, items }: NavGroup) {
+import IconWrap from '@/components/icon-wrap';
+import * as TablerIcons from '@tabler/icons-react';
+import { IconHelpCircle, IconLayoutDashboard } from '@tabler/icons-react';
+const Icons = TablerIcons as unknown as Record<string, React.ElementType>;
+
+export function NavGroup({ title, items }: MenuGroup) {
     const { state } = useSidebar();
     // const href = useLocation({ select: (location) => location.href })
     const { url: href } = usePage();
@@ -48,13 +53,15 @@ export function NavGroup({ title, items }: NavGroup) {
 
 const NavBadge = ({ children }: { children: ReactNode }) => <Badge className="rounded-full px-1 py-0 text-xs">{children}</Badge>;
 
-const SidebarMenuLink = ({ item, href }: { item: NavLink; href: string }) => {
+const SidebarMenuLink = ({ item, href }: { item: Menu; href: string }) => {
     const { setOpenMobile } = useSidebar();
+    const Icon = Icons[item?.icon ?? ''] ?? IconHelpCircle;
     return (
         <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={checkIsActive(href, item)} tooltip={item.title}>
-                <Link href={item.url} onClick={() => setOpenMobile(false)}>
-                    {item.icon && <item.icon />}
+                <Link href={item.url} onClick={() => setOpenMobile(false)} className="size-10">
+                    {/*{Icon && <Icon className="!h-5 !w-5" />}*/}
+                    <IconWrap icon={IconLayoutDashboard} size={100} />
                     <span>{item.title}</span>
                     {item.badge && <NavBadge>{item.badge}</NavBadge>}
                 </Link>
@@ -63,14 +70,15 @@ const SidebarMenuLink = ({ item, href }: { item: NavLink; href: string }) => {
     );
 };
 
-const SidebarMenuCollapsible = ({ item, href }: { item: NavCollapsible; href: string }) => {
+const SidebarMenuCollapsible = ({ item, href }: { item: Menu; href: string }) => {
     const { setOpenMobile } = useSidebar();
+    const Icon = Icons[item?.icon ?? ''] ?? IconHelpCircle;
     return (
         <Collapsible asChild defaultOpen={checkIsActive(href, item, true)} className="group/collapsible">
             <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                     <SidebarMenuButton tooltip={item.title}>
-                        {item.icon && <item.icon />}
+                        {Icon && <Icon size={40} />}
                         <span>{item.title}</span>
                         {item.badge && <NavBadge>{item.badge}</NavBadge>}
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -78,11 +86,11 @@ const SidebarMenuCollapsible = ({ item, href }: { item: NavCollapsible; href: st
                 </CollapsibleTrigger>
                 <CollapsibleContent className="CollapsibleContent">
                     <SidebarMenuSub>
-                        {item.items.map((subItem) => (
+                        {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                                 <SidebarMenuSubButton asChild isActive={checkIsActive(href, subItem)}>
                                     <Link href={subItem.url} onClick={() => setOpenMobile(false)}>
-                                        {subItem.icon && <subItem.icon />}
+                                        {/*{subItem.icon && <subItem.icon />}*/}
                                         <span>{subItem.title}</span>
                                         {subItem.badge && <NavBadge>{subItem.badge}</NavBadge>}
                                     </Link>
@@ -96,13 +104,14 @@ const SidebarMenuCollapsible = ({ item, href }: { item: NavCollapsible; href: st
     );
 };
 
-const SidebarMenuCollapsedDropdown = ({ item, href }: { item: NavCollapsible; href: string }) => {
+const SidebarMenuCollapsedDropdown = ({ item, href }: { item: Menu; href: string }) => {
+    const Icon = Icons[item?.icon ?? ''] ?? IconHelpCircle;
     return (
         <SidebarMenuItem>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <SidebarMenuButton tooltip={item.title} isActive={checkIsActive(href, item)}>
-                        {item.icon && <item.icon />}
+                        {Icon && <Icon />}
                         <span>{item.title}</span>
                         {item.badge && <NavBadge>{item.badge}</NavBadge>}
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -113,10 +122,10 @@ const SidebarMenuCollapsedDropdown = ({ item, href }: { item: NavCollapsible; hr
                         {item.title} {item.badge ? `(${item.badge})` : ''}
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {item.items.map((sub) => (
+                    {item.items?.map((sub) => (
                         <DropdownMenuItem key={`${sub.title}-${sub.url}`} asChild>
                             <Link href={sub.url} className={`${checkIsActive(href, sub) ? 'bg-secondary' : ''}`}>
-                                {sub.icon && <sub.icon />}
+                                {/*{sub.icon && <sub.icon />}*/}
                                 <span className="max-w-52 text-wrap">{sub.title}</span>
                                 {sub.badge && <span className="ml-auto text-xs">{sub.badge}</span>}
                             </Link>
@@ -128,7 +137,7 @@ const SidebarMenuCollapsedDropdown = ({ item, href }: { item: NavCollapsible; hr
     );
 };
 
-function checkIsActive(href: string, item: NavItem, mainNav = false) {
+function checkIsActive(href: string, item: Menu, mainNav = false) {
     return (
         href === item.url || // /endpint?search=param
         href.split('?')[0] === item.url || // endpoint

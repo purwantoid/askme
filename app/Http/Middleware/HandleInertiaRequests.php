@@ -33,6 +33,7 @@ final class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -40,6 +41,43 @@ final class HandleInertiaRequests extends Middleware
                     'teams:id,name,owner_id',
                     'currentTeam:id,name,owner_id',
                 )) : null,
+            ],
+            'menus' => [
+                [
+                    'title' => 'General',
+                    'items' => [
+                        [
+                            'title' => 'Dashboard',
+                            'url' => '/dashboard',
+                            'icon' => 'IconLayoutDashboard',
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Administration',
+                    'items' => [
+                        [
+                            'title' => 'Priority',
+                            'url' => '/dashboard/priority',
+                            'icon' => 'IconChecklist',
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'Access Control',
+                    'items' => [
+                        [
+                            'title' => 'Roles',
+                            'url' => '/dashboard/roles',
+                            'icon' => 'IconShieldCheck',
+                        ],
+                        [
+                            'title' => 'Users',
+                            'url' => '/dashboard/users',
+                            'icon' => 'IconUsers',
+                        ],
+                    ],
+                ],
             ],
             'csrf_token' => csrf_token(),
         ];
