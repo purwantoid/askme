@@ -16,18 +16,10 @@ return [
              * Permissions Aligned with Policies.
              * DO NOT change the keys unless the genericPolicy.stub is published and altered accordingly
              */
-            'viewAnyPermission' => 'view-any',
             'viewPermission' => 'view',
             'createPermission' => 'create',
             'updatePermission' => 'update',
             'deletePermission' => 'delete',
-            'deleteAnyPermission' => 'delete-any',
-            'replicatePermission' => 'replicate',
-            'restorePermission' => 'restore',
-            'restoreAnyPermission' => 'restore-any',
-            'reorderPermission' => 'reorder',
-            'forceDeletePermission' => 'force-delete',
-            'forceDeleteAnyPermission' => 'force-delete-any',
         ],
 
         /*
@@ -59,25 +51,22 @@ return [
          * Define custom_models
          */
         'custom_models' => [
-            //
+            Spatie\Permission\Models\Role::class,
         ],
 
         /*
          * Define excluded_models
          */
         'excluded_models' => [
-            //
         ],
 
         'excluded_policy_models' => [
-            App\Models\User::class,
         ],
 
         /*
          * Define any other permission that should be synced with the DB
          */
         'custom_permissions' => [
-            // 'view-log'
         ],
 
         'user_model' => App\Models\User::class,

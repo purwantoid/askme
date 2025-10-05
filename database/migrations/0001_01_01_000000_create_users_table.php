@@ -21,6 +21,7 @@ return new class() extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('status', UserStatus::cases())->default(UserStatus::Inactive->value);
+            $table->foreignId('current_team_id')->nullable();
             $table->string('kc_user_id')->nullable();
             $table->longText('kc_id_token')->nullable();
             $table->longText('kc_access_token')->nullable();

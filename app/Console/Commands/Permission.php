@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionException;
+use Spatie\Permission\Models\Role;
 
 final class Permission extends Command
 {
@@ -67,6 +68,17 @@ final class Permission extends Command
             $permissionModel::firstOrCreate($permission);
             $count++;
         }
+
+        $allPermissionWeb = collect($this->permissions)
+            ->where('guard_name', 'web')
+            ->pluck('name')
+            ->values()
+            ->toArray();
+
+        /** @var Role $roleModel */
+        $roleModel = config('permission.models.role');
+        $superAdminRole= $roleModel::query()->firstOrCreate(['name' => 'super-admin']);
+        $superAdminRole->givePermissionTo($allPermissionWeb);
 
         $this->info('<bg=green;options=bold;>DONE</>');
         $this->info($count . ' permissions synced successfully.');

@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
-class UserPolicy
+class RolePolicy
 {
-
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): bool
+    public function view(User $user): bool
     {
-        return $user->checkPermissionTo('view User');
+        return $user->checkPermissionTo('view Role','web');
     }
 
     /**
@@ -24,22 +22,22 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->checkPermissionTo('create User');
+        return $user->checkPermissionTo('create Role');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, Role $role): bool
     {
-        return $user->checkPermissionTo('update User');
+        return $user->checkPermissionTo('update Role');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, Role $role): bool
     {
-        return $user->checkPermissionTo('delete User');
+        return $user->checkPermissionTo('delete Role');
     }
 }

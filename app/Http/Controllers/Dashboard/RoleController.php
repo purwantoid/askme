@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Role\StoreRoleRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Log;
@@ -19,6 +20,7 @@ final class RoleController extends Controller
 {
     public function index(Request $request): \Inertia\Response|JsonResponse
     {
+        Gate::authorize('view', Role::class);
         if ($request->wantsJson()) {
             $query = Role::with('permissions');
             if ($request->filled('name')) {
@@ -66,7 +68,7 @@ final class RoleController extends Controller
         try {
             $validated = $request->validated();
             $role = Role::firstOrCreate([
-                'team_id' => 12,
+                'current_team_id' => getPermissionsTeamId(),
                 'name' => $validated['name'],
                 'guard_name' => $validated['guard_name'] ?? 'web',
             ]);

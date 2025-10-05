@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Dashboard\MenuController;
 use App\Http\Controllers\Dashboard\PriorityController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\RoleController;
@@ -55,4 +56,8 @@ Route::group(['prefix' => '/users'], static function () {
     Route::post('/store', [UserController::class, 'store'])->name('users.store');
     Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('users.destroy');
     Route::get('/roles', [UserController::class, 'roles'])->name('users.roles');
+});
+
+Route::group(['prefix' => '/menus'], static function () {
+    Route::get('/', [MenuController::class, 'index'])->name('menus.index');
 });
