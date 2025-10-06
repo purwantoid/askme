@@ -26,7 +26,7 @@ import {
 
 import IconWrap from '@/components/icon-wrap';
 import * as TablerIcons from '@tabler/icons-react';
-import { IconHelpCircle, IconLayoutDashboard } from '@tabler/icons-react';
+import { IconHelpCircle } from '@tabler/icons-react';
 const Icons = TablerIcons as unknown as Record<string, React.ElementType>;
 
 export function NavGroup({ title, items }: MenuGroup) {
@@ -60,8 +60,7 @@ const SidebarMenuLink = ({ item, href }: { item: Menu; href: string }) => {
         <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={checkIsActive(href, item)} tooltip={item.title}>
                 <Link href={item.url} onClick={() => setOpenMobile(false)} className="size-10">
-                    {/*{Icon && <Icon className="!h-5 !w-5" />}*/}
-                    <IconWrap icon={IconLayoutDashboard} size={100} />
+                    {Icon && <IconWrap icon={Icon} size={100} />}
                     <span>{item.title}</span>
                     {item.badge && <NavBadge>{item.badge}</NavBadge>}
                 </Link>
